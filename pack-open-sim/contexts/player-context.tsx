@@ -19,12 +19,17 @@ export interface Player {
     rare: number;
     holoRare: number;
   };
-  collectedCards: number[];
+  packInventory: {
+    [key: string]: number;
+  };
+  collectedCards: {
+    [key: string]: number[];
+  };
 }
 
 const defaultPlayer: Player = {
   username: "DefaultPlayerName",
-  money: 0,
+  money: 10000,
   openedPacks: 0,
   luck: 0,
   obtainedRaritiesTotal: {
@@ -34,7 +39,12 @@ const defaultPlayer: Player = {
     rare: 0,
     holoRare: 0,
   },
-  collectedCards: [],
+  packInventory: {
+    "Base Pack": 0,
+  },
+  collectedCards: {
+    "Base Pack": [],
+  },
 };
 
 interface PlayerContextValue {
