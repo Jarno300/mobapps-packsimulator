@@ -8,6 +8,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export interface Player {
+  username: string;
   money: number;
   openedPacks: number;
   luck: number;
@@ -22,6 +23,7 @@ export interface Player {
 }
 
 const defaultPlayer: Player = {
+  username: "DefaultPlayerName",
   money: 0,
   openedPacks: 0,
   luck: 0,
@@ -63,6 +65,14 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     setPlayer(updated);
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
   };
+
+  // browser console debugging: type window.player or window.updatePlayer({field: value})
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      (window as any).player = player;
+      (window as any).updatePlayer = updatePlayer;
+    }
+  }, [player, updatePlayer]);
 
   return (
     <PlayerContext.Provider value={{ player, updatePlayer }}>
