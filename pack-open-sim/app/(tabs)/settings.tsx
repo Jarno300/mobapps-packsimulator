@@ -1,12 +1,31 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Switch, View } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import { useTheme } from "@/contexts/theme-context";
 
 export default function SettingsScreen() {
+  const { theme, setTheme, isDark } = useTheme();
+
+  const toggleTheme = (value: boolean) => {
+    setTheme(value ? "dark" : "light");
+  };
+
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="title">Settings</ThemedText>
+      <ThemedText type="title" style={styles.title}>
+        Settings
+      </ThemedText>
+
+      <View style={styles.settingRow}>
+        <ThemedText style={styles.settingLabel}>Dark Mode</ThemedText>
+        <Switch
+          value={isDark}
+          onValueChange={toggleTheme}
+          trackColor={{ false: "#767577", true: "#81b0ff" }}
+          thumbColor={isDark ? "#f5dd4b" : "#f4f3f4"}
+        />
+      </View>
     </ThemedView>
   );
 }
@@ -14,7 +33,20 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    paddingTop: 60,
+    paddingHorizontal: 20,
+  },
+  title: {
+    marginBottom: 30,
+  },
+  settingRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 4,
+  },
+  settingLabel: {
+    fontSize: 16,
   },
 });
