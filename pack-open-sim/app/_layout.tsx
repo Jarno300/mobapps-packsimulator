@@ -8,6 +8,7 @@ import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 
 import { ThemeProvider } from "@/contexts/theme-context";
+import { PlayerProvider } from "@/contexts/player-context";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 
 export const unstable_settings = {
@@ -36,7 +37,9 @@ function RootLayoutNav() {
 export default function RootLayout() {
   return (
     <ThemeProvider>
-      <RootLayoutNav />
+      <PlayerProvider>
+        <RootLayoutNav />
+      </PlayerProvider>
     </ThemeProvider>
   );
 }
