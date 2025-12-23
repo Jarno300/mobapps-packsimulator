@@ -10,40 +10,30 @@ import "react-native-reanimated";
 import { ThemeProvider } from "@/contexts/theme-context";
 import { PlayerProvider } from "@/contexts/player-context";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { useLoadExpansions } from "@/hooks/use-load-expansions";
+import { fetchBaseSetCards } from "@/api/fetchCards";
 
 export const unstable_settings = {
   anchor: "(tabs)",
 };
 
-function RootLayoutNav() {
+async function RootLayoutNav() {
   const colorScheme = useColorScheme();
-  const initialLoad = useLoadExpansions();
+  await fetchBaseSetCards();
 
-  if (initialLoad) {
-    return (
-      <NavigationThemeProvider
-        value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-      >
-        <StatusBar style="auto" />
-      </NavigationThemeProvider>
-    );
-  } else {
-    return (
-      <NavigationThemeProvider
-        value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-      >
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="modal"
-            options={{ presentation: "modal", title: "Modal" }}
-          />
-        </Stack>
-        <StatusBar style="auto" />
-      </NavigationThemeProvider>
-    );
-  }
+  return (
+    <NavigationThemeProvider
+      value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+    >
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="modal"
+          options={{ presentation: "modal", title: "Modal" }}
+        />
+      </Stack>
+      <StatusBar style="auto" />
+    </NavigationThemeProvider>
+  );
 }
 
 export default function RootLayout() {

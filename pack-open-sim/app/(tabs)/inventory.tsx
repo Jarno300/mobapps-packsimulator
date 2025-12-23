@@ -10,13 +10,13 @@ import { useState } from "react";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { usePlayer } from "@/contexts/player-context";
-import { getCachedCardsByExpansionId } from "@/cache/setCardCache";
+import { Card, fetchBaseSetCards } from "@/api/fetchCards";
+import { getCardCache } from "@/cache/setCardCache";
 
 export default function InventoryScreen() {
   const { player } = usePlayer();
   const [selectedTab, setSelectedTab] = useState<"packs" | "cards">("packs");
-  const cards = getCachedCardsByExpansionId("base1");
-  console.log("Inventory cards length:", cards.length);
+  const cardCache = getCardCache();
 
   return (
     <ThemedView style={styles.container}>
@@ -77,7 +77,7 @@ export default function InventoryScreen() {
       {selectedTab === "cards" && (
         <ScrollView style={styles.content}>
           <View style={styles.cardsGrid}>
-            {cards.map((card: any) => (
+            {cardCache.map((card: Card) => (
               <View key={card.id} style={styles.cardItem}>
                 <Image
                   source={{ uri: card.images?.small }}

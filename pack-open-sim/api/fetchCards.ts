@@ -1,3 +1,5 @@
+import { initExpansionCache } from "@/cache/setCardCache";
+
 export interface Card {
   id: string;
   name: string;
@@ -12,11 +14,11 @@ export interface Card {
 
 const API_URL = "https://api.tcgdex.net/v2/en";
 
-export async function fetchCardsBySetId(setId: string): Promise<Card[]> {
-  const response = await fetch(`${API_URL}/cards?set=${setId}`);
+export async function fetchBaseSetCards() {
+  const response = await fetch(`${API_URL}/cards?set=base1`);
   if (!response.ok) {
     throw new Error("Failed to get API response");
   }
   const json = await response.json();
-  return json.data as Card[];
+  initExpansionCache(json.data as Card[]);
 }
