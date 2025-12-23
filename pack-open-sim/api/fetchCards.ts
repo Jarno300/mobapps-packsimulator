@@ -10,10 +10,10 @@ export interface Card {
   };
 }
 
-const API_URL = "https://api.pokemontcg.io/v2";
+const API_URL = "https://api.tcgdex.net/v2/en";
 
 export async function fetchCardsBySetId(setId: string): Promise<Card[]> {
-  const response = await fetch(`${API_URL}/cards?q=set.id:${setId}`);
+  const response = await fetch(`${API_URL}/cards?set=${setId}`);
   if (!response.ok) {
     throw new Error("Failed to get API response");
   }

@@ -19,7 +19,9 @@ export default function HomeScreen() {
           justifyContent: "center",
         }}
       >
-        <ThemedText style={{ color: "white", fontSize: 24 }}>test</ThemedText>
+        <ThemedText style={{ color: "white", fontSize: 24 }}>
+          Loading...
+        </ThemedText>
       </ThemedView>
     );
   }

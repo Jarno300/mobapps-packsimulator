@@ -7,10 +7,15 @@ export type ExpansionCache = Record<string, Card[]>;
 const expansionCache: ExpansionCache = {};
 
 export async function initExpansionCache(): Promise<void> {
+  let totalSets = 0;
+  let setNames = "";
+
   for (const expansion of USED_EXPANSIONS) {
     try {
       const cards = await fetchCardsBySetId(expansion.expansionIdApi);
       expansionCache[expansion.expansionIdApi] = cards;
+      totalSets++;
+      setNames += `${expansion.expansionIdApi} `;
     } catch (e) {
       console.error(
         "Failed to load set with id: ",
@@ -21,6 +26,7 @@ export async function initExpansionCache(): Promise<void> {
       expansionCache[expansion.expansionIdApi] = [];
     }
   }
+  console.log(`Loaded ${totalSets} sets: ${setNames}).`);
 }
 
 export function getCachedCardsByExpansionId(expansionId: string): Card[] {
