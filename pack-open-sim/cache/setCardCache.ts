@@ -1,6 +1,5 @@
-import { Expansion, USED_EXPANSIONS } from "@/constants/expansions";
+import { USED_EXPANSIONS } from "@/constants/expansions";
 import { fetchCardsBySetId, Card } from "@/api/fetchCards";
-import { ExpoConfigItem } from "expo-router/build/fork/getPathFromState-forks";
 
 export type ExpansionCache = Record<string, Card[]>;
 
@@ -30,5 +29,8 @@ export async function initExpansionCache(): Promise<void> {
 }
 
 export function getCachedCardsByExpansionId(expansionId: string): Card[] {
-  return expansionCache[expansionId] ?? [];
+  console.log(
+    `Getting ${expansionCache[expansionId].length} cards for expansionId: ${expansionId}`
+  );
+  return expansionCache[expansionId];
 }

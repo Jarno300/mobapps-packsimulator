@@ -1,13 +1,22 @@
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  Image,
+} from "react-native";
 import { useState } from "react";
 
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { usePlayer } from "@/contexts/player-context";
+import { getCachedCardsByExpansionId } from "@/cache/setCardCache";
 
 export default function InventoryScreen() {
   const { player } = usePlayer();
   const [selectedTab, setSelectedTab] = useState<"packs" | "cards">("packs");
+  const cards = getCachedCardsByExpansionId("base1");
+  console.log("Inventory cards length:", cards.length);
 
   return (
     <ThemedView style={styles.container}>
@@ -67,7 +76,17 @@ export default function InventoryScreen() {
 
       {selectedTab === "cards" && (
         <ScrollView style={styles.content}>
-          <ThemedText>Cards view coming soon</ThemedText>
+          <View style={styles.cardsGrid}>
+            {cards.map((card: any) => (
+              <View key={card.id} style={styles.cardItem}>
+                <Image
+                  source={{ uri: card.images?.small }}
+                  style={styles.cardImage}
+                  resizeMode="contain"
+                />
+              </View>
+            ))}
+          </View>
         </ScrollView>
       )}
     </ThemedView>
@@ -134,5 +153,19 @@ const styles = StyleSheet.create({
   },
   count: {
     fontSize: 16,
+  },
+  cardsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+  cardItem: {
+    width: "33.3333%", // 3 columns
+    padding: 4,
+    alignItems: "center",
+  },
+  cardImage: {
+    width: "100%",
+    aspectRatio: 63 / 88, // typical card ratio, tweak if needed
+    borderRadius: 4,
   },
 });

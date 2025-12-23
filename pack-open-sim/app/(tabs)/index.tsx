@@ -3,29 +3,9 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { usePlayer } from "@/contexts/player-context";
-import { useLoadExpansions } from "@/hooks/use-load-expansions";
 
 export default function HomeScreen() {
   const { player } = usePlayer();
-  const loading = useLoadExpansions();
-
-  if (loading) {
-    return (
-      <ThemedView
-        style={{
-          flex: 1,
-          backgroundColor: "red",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <ThemedText style={{ color: "white", fontSize: 24 }}>
-          Loading...
-        </ThemedText>
-      </ThemedView>
-    );
-  }
-
   return (
     <ThemedView style={styles.container}>
       <ScrollView style={styles.content}>
