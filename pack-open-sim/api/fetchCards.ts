@@ -1,7 +1,8 @@
 export interface Card {
   id: string;
   name: string;
-  type?: string;
+  superType?: string;
+  subTypes?: string;
   rarity?: string;
   images?: {
     small: string;
@@ -11,8 +12,8 @@ export interface Card {
 
 const API_URL = "https://api.pokemontcg.io/v2";
 
-export async function fetchBaseSetCards(): Promise<Card[]> {
-  const response = await fetch(`${API_URL}/cards?q=set.id:base1`);
+export async function fetchCardsBySetId(setId: string): Promise<Card[]> {
+  const response = await fetch(`${API_URL}/cards?q=set.id:${setId}`);
   if (!response.ok) {
     throw new Error("Failed to get API response");
   }
