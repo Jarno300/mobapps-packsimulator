@@ -10,18 +10,46 @@ import { useState, useEffect } from "react";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Player, usePlayer } from "@/contexts/player-context";
-import { Card } from "@/api/fetchCards";
+import {
+  Card,
+  getFetchStatus,
+  resetFetchStatus,
+  fetchBaseSetCards,
+} from "@/api/fetchCards";
 import { getCardCache } from "@/cache/setCardCache";
 
 export default function InventoryScreen() {
   const { player } = usePlayer();
   const [selectedTab, setSelectedTab] = useState<"packs" | "cards">("packs");
   const [cardCache, setCardCache] = useState<Card[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Update card cache when component mounts
-    const cache = getCardCache();
-    setCardCache([...cache]);
+    const checkCache = () => {
+      const cache = getCardCache();
+      const status = getFetchStatus();
+
+      setIsLoading(status.isFetching);
+      setError(status.fetchError?.message || null);
+      setCardCache([...cache]);
+
+      // Stop polling once fetched or errored
+      if (status.hasFetched || status.fetchError) {
+        return true;
+      }
+      return false;
+    };
+
+    if (!checkCache()) {
+      // Poll until loaded
+      const interval = setInterval(() => {
+        if (checkCache()) {
+          clearInterval(interval);
+        }
+      }, 500);
+      return () => clearInterval(interval);
+    }
   }, []);
 
   useEffect(() => {
@@ -32,6 +60,21 @@ export default function InventoryScreen() {
     }
   }, [selectedTab]);
 
+  const handleRetry = async () => {
+    setIsLoading(true);
+    setError(null);
+    resetFetchStatus();
+    try {
+      await fetchBaseSetCards();
+      const cache = getCardCache();
+      setCardCache([...cache]);
+      setIsLoading(false);
+    } catch (err) {
+      setError((err as Error).message);
+      setIsLoading(false);
+    }
+  };
+
   return (
     <ThemedView style={styles.container}>
       <ThemedText type="title" style={styles.title}>
@@ -41,7 +84,8 @@ export default function InventoryScreen() {
 
       {selectedTab === "packs" && renderPackInventory(player)}
 
-      {selectedTab === "cards" && renderCardList(cardCache)}
+      {selectedTab === "cards" &&
+        renderCardList(cardCache, isLoading, error, handleRetry)}
     </ThemedView>
   );
 }
@@ -81,54 +125,74 @@ function renderInventoryTabs(selectedTab: string, setSelectedTab: any) {
   );
 }
 
-function renderCardList(cardCache: Card[]) {
+function renderCardList(
+  cardCache: Card[],
+  isLoading: boolean,
+  error: string | null,
+  onRetry: () => void
+) {
+  if (isLoading) {
+    return (
+      <View style={styles.emptyState}>
+        <ThemedText style={styles.emptyStateText}>Loading cards...</ThemedText>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.emptyState}>
+        <ThemedText style={styles.errorText}>Failed to load cards</ThemedText>
+        <ThemedText style={styles.debugText}>{error}</ThemedText>
+        <TouchableOpacity style={styles.refreshButton} onPress={onRetry}>
+          <ThemedText>Retry</ThemedText>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  if (cardCache.length === 0) {
+    return (
+      <View style={styles.emptyState}>
+        <ThemedText style={styles.emptyStateText}>
+          No cards available
+        </ThemedText>
+        <TouchableOpacity style={styles.refreshButton} onPress={onRetry}>
+          <ThemedText>Refresh</ThemedText>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <ScrollView style={styles.content}>
-      {cardCache.length > 0 && cardCache[0] && !cardCache[0].image && (
-        <View style={styles.debugInfo}>
-          <ThemedText style={styles.debugText}>
-            Debug: First card image structure:{" "}
-            {JSON.stringify(cardCache[0].image || "No images property")}
-          </ThemedText>
-          <ThemedText style={styles.debugText}>
-            First card keys: {Object.keys(cardCache[0]).join(", ")}
-          </ThemedText>
-        </View>
-      )}
-      {cardCache.length === 0 ? (
-        <View style={styles.emptyState}>
-          <ThemedText style={styles.emptyStateText}>
-            No cards loaded yet. Cards are being fetched...
-          </ThemedText>
-          <ThemedText style={styles.emptyStateText}>
-            Cache size: {getCardCache().length}
-          </ThemedText>
-        </View>
-      ) : (
-        <View style={styles.cardsGrid}>
-          {cardCache.map((card: Card) => {
-            const imageUri = card.image;
-            return (
-              <View key={card.id} style={styles.cardItem}>
-                {imageUri ? (
-                  <Image
-                    source={{ uri: imageUri }}
-                    style={styles.cardImage}
-                    resizeMode="contain"
-                    onError={() => {}}
-                  />
-                ) : (
-                  <View style={styles.cardPlaceholder}>
-                    <ThemedText style={styles.cardNameText} numberOfLines={2}>
-                      {card.name || "Unknown Card"}
-                    </ThemedText>
-                  </View>
-                )}
-              </View>
-            );
-          })}
-        </View>
-      )}
+      <View style={styles.cardsHeader}>
+        <ThemedText style={styles.cardCount}>
+          {cardCache.length} cards loaded
+        </ThemedText>
+      </View>
+      <View style={styles.cardsGrid}>
+        {cardCache.map((card: Card) => {
+          const imageUri = card.image;
+          return (
+            <View key={card.id} style={styles.cardItem}>
+              {imageUri ? (
+                <Image
+                  source={{ uri: imageUri }}
+                  style={styles.cardImage}
+                  resizeMode="contain"
+                />
+              ) : (
+                <View style={styles.cardPlaceholder}>
+                  <ThemedText style={styles.cardNameText} numberOfLines={2}>
+                    {card.name || "Unknown Card"}
+                  </ThemedText>
+                </View>
+              )}
+            </View>
+          );
+        })}
+      </View>
     </ScrollView>
   );
 }
@@ -213,19 +277,26 @@ const styles = StyleSheet.create({
   count: {
     fontSize: 16,
   },
+  cardsHeader: {
+    marginBottom: 12,
+  },
+  cardCount: {
+    fontSize: 14,
+    opacity: 0.7,
+  },
   cardsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
   },
   cardItem: {
-    width: "33.3333%", // 3 columns
+    width: "33.3333%",
     padding: 4,
     alignItems: "center",
     minHeight: 120,
   },
   cardImage: {
     width: "100%",
-    aspectRatio: 63 / 88, // typical card ratio, tweak if needed
+    aspectRatio: 63 / 88,
     borderRadius: 4,
     backgroundColor: "#f0f0f0",
   },
@@ -256,20 +327,22 @@ const styles = StyleSheet.create({
     opacity: 0.6,
     marginBottom: 10,
   },
+  errorText: {
+    textAlign: "center",
+    color: "#d32f2f",
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
+  debugText: {
+    fontSize: 12,
+    opacity: 0.6,
+    marginBottom: 16,
+    textAlign: "center",
+  },
   refreshButton: {
     marginTop: 20,
     padding: 12,
     backgroundColor: "rgba(10, 126, 164, 0.2)",
     borderRadius: 8,
-  },
-  debugInfo: {
-    padding: 10,
-    backgroundColor: "rgba(255, 255, 0, 0.1)",
-    marginBottom: 10,
-    borderRadius: 4,
-  },
-  debugText: {
-    fontSize: 12,
-    marginBottom: 4,
   },
 });
