@@ -20,5 +20,13 @@ export async function fetchBaseSetCards() {
     throw new Error("Failed to get API response");
   }
   const json = await response.json();
-  initExpansionCache(json.data as Card[]);
+  // Handle different possible response structures
+  const cards = Array.isArray(json) ? json : (json.data || json.cards || []);
+  
+  if (!Array.isArray(cards)) {
+    console.error("API response is not an array:", json);
+    throw new Error("Invalid API response format: expected an array of cards");
+  }
+  
+  await initExpansionCache(cards as Card[]);
 }

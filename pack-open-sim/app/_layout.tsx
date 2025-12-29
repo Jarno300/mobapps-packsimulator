@@ -5,6 +5,7 @@ import {
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
 import "react-native-reanimated";
 
 import { ThemeProvider } from "@/contexts/theme-context";
@@ -16,9 +17,14 @@ export const unstable_settings = {
   anchor: "(tabs)",
 };
 
-async function RootLayoutNav() {
+function RootLayoutNav() {
   const colorScheme = useColorScheme();
-  await fetchBaseSetCards();
+
+  useEffect(() => {
+    fetchBaseSetCards().catch((error) => {
+      console.error("Failed to fetch base set cards:", error);
+    });
+  }, []);
 
   return (
     <NavigationThemeProvider
