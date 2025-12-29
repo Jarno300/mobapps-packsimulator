@@ -9,12 +9,13 @@ export default function AchievementsScreen() {
     <ThemedView style={styles.container}>
       <Achievement
         title="Pack Opener I"
-        subtitle="Open 5 packs"
+        subtitle="Open 5 packs - 500$"
         condition={(player) => player.openedPacks >= 5}
         onClaim={({ player, updatePlayer }) => {
-          // example: give 500 money when claiming
-          updatePlayer({ money: player.money + 500 });
-          // optionally: mark achievement as claimed in some achievement state
+          updatePlayer({
+            money: player.money + 500,
+            achievements: [...player.achievements, "Pack Opener I"],
+          });
         }}
       />
     </ThemedView>
