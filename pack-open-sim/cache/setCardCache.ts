@@ -9,3 +9,7 @@ export async function initExpansionCache(cards: Card[]): Promise<void> {
   }
   cardCache.push(...cards);
 }
+
+export function getCardCache(): Card[] {
+  return cardCache;
+}
