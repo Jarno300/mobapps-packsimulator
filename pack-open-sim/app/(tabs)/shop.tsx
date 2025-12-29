@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View, Image } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
@@ -37,9 +37,11 @@ export default function ShopScreen() {
           onPress={buyBasePack}
           disabled={player.money < 500}
         >
-          <View style={styles.imagePlaceholder}>
-            <ThemedText>Base Pack</ThemedText>
-          </View>
+          <Image source={require("../../assets/images/Booster-Pack-Charizard.png")}
+            style={styles.imagePlaceholder}
+          />
+
+
         </TouchableOpacity>
         <View style={styles.priceContainer}>
           <ThemedText type="defaultSemiBold" style={styles.price}>
@@ -47,7 +49,46 @@ export default function ShopScreen() {
           </ThemedText>
         </View>
       </View>
-    </ThemedView>
+
+      <View style={styles.packContainer}>
+        <TouchableOpacity
+          style={styles.packButton}
+          onPress={buyBasePack}
+          disabled={player.money < 500}
+        >
+          <Image source={require("../../assets/images/Booster-Pack-Blastoise.png")}
+            style={styles.imagePlaceholder}
+          />
+
+
+        </TouchableOpacity>
+        <View style={styles.priceContainer}>
+          <ThemedText type="defaultSemiBold" style={styles.price}>
+            500
+          </ThemedText>
+        </View>
+      </View>
+
+      <View style={styles.packContainer}>
+        <TouchableOpacity
+          style={styles.packButton}
+          onPress={buyBasePack}
+          disabled={player.money < 500}
+        >
+          <Image source={require("../../assets/images/Booster-Pack-Bulbasaur.png")}
+            style={styles.imagePlaceholder}
+          />
+
+
+        </TouchableOpacity>
+        <View style={styles.priceContainer}>
+          <ThemedText type="defaultSemiBold" style={styles.price}>
+            500
+          </ThemedText>
+        </View>
+      </View>
+
+    </ThemedView >
   );
 }
 
@@ -77,14 +118,15 @@ const styles = StyleSheet.create({
     opacity: 1,
   },
   imagePlaceholder: {
+
     width: 120,
-    height: 120,
-    backgroundColor: "#ccc",
-    borderRadius: 8,
+    height: 200,
+    resizeMode: "contain",
+
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 2,
-    borderColor: "#999",
+
+
   },
   priceContainer: {
     flex: 1,
