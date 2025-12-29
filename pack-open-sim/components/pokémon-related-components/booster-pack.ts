@@ -10,15 +10,15 @@ export interface BoosterPack {
 
 }
 
-export const createBoosterPack = (id: number, name: string, image: string): BoosterPack => {
+export const createBoosterPack = (name: string, image: string): BoosterPack => {
     const cardList = getCardCache();
     const cardRandomizer: Card[] = [];
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 11; i++) {
         const randomIndex = Math.floor(Math.random() * cardList.length);
         cardRandomizer.push(cardList[randomIndex]);
     }
     const newPack: BoosterPack = {
-        id,
+        id: Date.now(),
         name,
         image,
         cards: cardRandomizer,

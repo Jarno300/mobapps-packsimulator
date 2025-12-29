@@ -3,11 +3,19 @@ import { StyleSheet, TouchableOpacity, View, Image } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { usePlayer } from "@/contexts/player-context";
+import { addAndSaveNewPack } from "@/api/fetchBoosterPacks";
+
+
+
+
+
+
+
 
 export default function ShopScreen() {
   const { player, updatePlayer } = usePlayer();
 
-  const buyBasePack = () => {
+  const buyBasePack = (id: number, name: string, imageSource: string) => {
     if (player.money >= 500) {
       const currentBasePacks = player.packInventory["Base Pack"] || 0;
       updatePlayer({
@@ -17,6 +25,7 @@ export default function ShopScreen() {
           "Base Pack": currentBasePacks + 1,
         },
       });
+      addAndSaveNewPack(name, imageSource);
     }
   };
 
@@ -34,10 +43,10 @@ export default function ShopScreen() {
       <View style={styles.packContainer}>
         <TouchableOpacity
           style={styles.packButton}
-          onPress={buyBasePack}
+          onPress={() => buyBasePack(1, "Booster-Pack-Charizard", "@/assets/images/Booster-Pack-Charizard.png")}
           disabled={player.money < 500}
         >
-          <Image source={require("../../assets/images/Booster-Pack-Charizard.png")}
+          <Image source={require("@/assets/images/Booster-Pack-Charizard.png")}
             style={styles.imagePlaceholder}
           />
 
@@ -53,10 +62,10 @@ export default function ShopScreen() {
       <View style={styles.packContainer}>
         <TouchableOpacity
           style={styles.packButton}
-          onPress={buyBasePack}
+          onPress={() => buyBasePack(1, "Booster-Pack-Blastoise", "@/assets/images/Booster-Pack-Blastoise.png")}
           disabled={player.money < 500}
         >
-          <Image source={require("../../assets/images/Booster-Pack-Blastoise.png")}
+          <Image source={require("@/assets/images/Booster-Pack-Blastoise.png")}
             style={styles.imagePlaceholder}
           />
 
@@ -72,10 +81,10 @@ export default function ShopScreen() {
       <View style={styles.packContainer}>
         <TouchableOpacity
           style={styles.packButton}
-          onPress={buyBasePack}
+          onPress={() => buyBasePack(1, "Booster-Pack-Bulbasaur", "@/assets/images/Booster-Pack-Bulbasaur.png")}
           disabled={player.money < 500}
         >
-          <Image source={require("../../assets/images/Booster-Pack-Bulbasaur.png")}
+          <Image source={require("@/assets/images/Booster-Pack-Bulbasaur.png")}
             style={styles.imagePlaceholder}
           />
 
