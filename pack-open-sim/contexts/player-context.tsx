@@ -8,6 +8,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export interface Player {
+  achievements: string[];
   username: string;
   money: number;
   openedPacks: number;
@@ -28,6 +29,7 @@ export interface Player {
 }
 
 const defaultPlayer: Player = {
+  achievements: [],
   username: "DefaultPlayerName",
   money: 10000,
   openedPacks: 0,

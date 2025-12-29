@@ -2,11 +2,21 @@ import { StyleSheet } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
+import Achievement from "@/components/achievement";
 
 export default function AchievementsScreen() {
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="title">Achievements</ThemedText>
+      <Achievement
+        title="Pack Opener I"
+        subtitle="Open 5 packs"
+        condition={(player) => player.openedPacks >= 5}
+        onClaim={({ player, updatePlayer }) => {
+          // example: give 500 money when claiming
+          updatePlayer({ money: player.money + 500 });
+          // optionally: mark achievement as claimed in some achievement state
+        }}
+      />
     </ThemedView>
   );
 }
@@ -14,7 +24,7 @@ export default function AchievementsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    padding: 16,
+    gap: 16,
   },
 });

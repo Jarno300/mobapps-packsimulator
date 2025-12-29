@@ -12,6 +12,7 @@ import { ThemeProvider } from "@/contexts/theme-context";
 import { PlayerProvider } from "@/contexts/player-context";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { fetchBaseSetCards } from "@/api/fetchCards";
+import { usePlayer } from "@/contexts/player-context";
 
 export const unstable_settings = {
   anchor: "(tabs)",
@@ -19,6 +20,7 @@ export const unstable_settings = {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
+  const player = usePlayer();
 
   useEffect(() => {
     fetchBaseSetCards().catch((error) => {
