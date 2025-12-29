@@ -9,8 +9,8 @@ import { useState, useEffect } from "react";
 
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { usePlayer } from "@/contexts/player-context";
-import { Card, fetchBaseSetCards } from "@/api/fetchCards";
+import { Player, usePlayer } from "@/contexts/player-context";
+import { Card } from "@/api/fetchCards";
 import { getCardCache } from "@/cache/setCardCache";
 
 export default function InventoryScreen() {
@@ -37,110 +37,118 @@ export default function InventoryScreen() {
       <ThemedText type="title" style={styles.title}>
         Inventory
       </ThemedText>
+      {renderInventoryTabs(selectedTab, setSelectedTab)}
 
-      <View style={styles.tabs}>
-        <TouchableOpacity
-          style={[styles.tab, selectedTab === "packs" && styles.tabActive]}
-          onPress={() => setSelectedTab("packs")}
-        >
-          <ThemedText
-            type="defaultSemiBold"
-            style={[
-              styles.tabText,
-              selectedTab === "packs" && styles.tabTextActive,
-            ]}
-          >
-            Packs
-          </ThemedText>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.tab, selectedTab === "cards" && styles.tabActive]}
-          onPress={() => setSelectedTab("cards")}
-        >
-          <ThemedText
-            type="defaultSemiBold"
-            style={[
-              styles.tabText,
-              selectedTab === "cards" && styles.tabTextActive,
-            ]}
-          >
-            Cards
-          </ThemedText>
-        </TouchableOpacity>
-      </View>
+      {selectedTab === "packs" && renderPackInventory(player)}
 
-      {selectedTab === "packs" && (
-        <ScrollView style={styles.content}>
-          <View style={styles.packsGrid}>
-            {Object.entries(player.packInventory).map(([packName, count]) => (
-              <View key={packName} style={styles.packItem}>
-                <View style={styles.packImagePlaceholder}>
-                  <ThemedText style={styles.packNameText}>
-                    {packName}
-                  </ThemedText>
-                </View>
-                <ThemedText type="defaultSemiBold" style={styles.count}>
-                  x{count}
-                </ThemedText>
-              </View>
-            ))}
-          </View>
-        </ScrollView>
-      )}
-
-      {selectedTab === "cards" && (
-        <ScrollView style={styles.content}>
-          {cardCache.length > 0 && cardCache[0] && !cardCache[0].image && (
-            <View style={styles.debugInfo}>
-              <ThemedText style={styles.debugText}>
-                Debug: First card image structure:{" "}
-                {JSON.stringify(cardCache[0].image || "No images property")}
-              </ThemedText>
-              <ThemedText style={styles.debugText}>
-                First card keys: {Object.keys(cardCache[0]).join(", ")}
-              </ThemedText>
-            </View>
-          )}
-          {cardCache.length === 0 ? (
-            <View style={styles.emptyState}>
-              <ThemedText style={styles.emptyStateText}>
-                No cards loaded yet. Cards are being fetched...
-              </ThemedText>
-              <ThemedText style={styles.emptyStateText}>
-                Cache size: {getCardCache().length}
-              </ThemedText>
-            </View>
-          ) : (
-            <View style={styles.cardsGrid}>
-              {cardCache.map((card: Card) => {
-                const imageUri = card.image;
-                return (
-                  <View key={card.id} style={styles.cardItem}>
-                    {imageUri ? (
-                      <Image
-                        source={{ uri: imageUri }}
-                        style={styles.cardImage}
-                        resizeMode="contain"
-                        onError={() => {}}
-                      />
-                    ) : (
-                      <View style={styles.cardPlaceholder}>
-                        <ThemedText
-                          style={styles.cardNameText}
-                          numberOfLines={2}
-                        >
-                          {card.name || "Unknown Card"}
-                        </ThemedText>
-                      </View>
-                    )}
-                  </View>
-                );
-              })}
-            </View>
-          )}
-        </ScrollView>
-      )}
+      {selectedTab === "cards" && renderCardList(cardCache)}
     </ThemedView>
+  );
+}
+
+function renderInventoryTabs(selectedTab: string, setSelectedTab: any) {
+  return (
+    <View style={styles.tabs}>
+      <TouchableOpacity
+        style={[styles.tab, selectedTab === "packs" && styles.tabActive]}
+        onPress={() => setSelectedTab("packs")}
+      >
+        <ThemedText
+          type="defaultSemiBold"
+          style={[
+            styles.tabText,
+            selectedTab === "packs" && styles.tabTextActive,
+          ]}
+        >
+          Packs
+        </ThemedText>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.tab, selectedTab === "cards" && styles.tabActive]}
+        onPress={() => setSelectedTab("cards")}
+      >
+        <ThemedText
+          type="defaultSemiBold"
+          style={[
+            styles.tabText,
+            selectedTab === "cards" && styles.tabTextActive,
+          ]}
+        >
+          Cards
+        </ThemedText>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+function renderCardList(cardCache: Card[]) {
+  return (
+    <ScrollView style={styles.content}>
+      {cardCache.length > 0 && cardCache[0] && !cardCache[0].image && (
+        <View style={styles.debugInfo}>
+          <ThemedText style={styles.debugText}>
+            Debug: First card image structure:{" "}
+            {JSON.stringify(cardCache[0].image || "No images property")}
+          </ThemedText>
+          <ThemedText style={styles.debugText}>
+            First card keys: {Object.keys(cardCache[0]).join(", ")}
+          </ThemedText>
+        </View>
+      )}
+      {cardCache.length === 0 ? (
+        <View style={styles.emptyState}>
+          <ThemedText style={styles.emptyStateText}>
+            No cards loaded yet. Cards are being fetched...
+          </ThemedText>
+          <ThemedText style={styles.emptyStateText}>
+            Cache size: {getCardCache().length}
+          </ThemedText>
+        </View>
+      ) : (
+        <View style={styles.cardsGrid}>
+          {cardCache.map((card: Card) => {
+            const imageUri = card.image;
+            return (
+              <View key={card.id} style={styles.cardItem}>
+                {imageUri ? (
+                  <Image
+                    source={{ uri: imageUri }}
+                    style={styles.cardImage}
+                    resizeMode="contain"
+                    onError={() => {}}
+                  />
+                ) : (
+                  <View style={styles.cardPlaceholder}>
+                    <ThemedText style={styles.cardNameText} numberOfLines={2}>
+                      {card.name || "Unknown Card"}
+                    </ThemedText>
+                  </View>
+                )}
+              </View>
+            );
+          })}
+        </View>
+      )}
+    </ScrollView>
+  );
+}
+
+function renderPackInventory(player: Player) {
+  return (
+    <ScrollView style={styles.content}>
+      <View style={styles.packsGrid}>
+        {Object.entries(player.packInventory).map(([packName, count]) => (
+          <View key={packName} style={styles.packItem}>
+            <View style={styles.packImagePlaceholder}>
+              <ThemedText style={styles.packNameText}>{packName}</ThemedText>
+            </View>
+            <ThemedText type="defaultSemiBold" style={styles.count}>
+              x{count}
+            </ThemedText>
+          </View>
+        ))}
+      </View>
+    </ScrollView>
   );
 }
 
