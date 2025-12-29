@@ -6,27 +6,58 @@ export interface Card {
   superType?: string;
   subTypes?: string;
   rarity?: string;
-  images?: {
-    small: string;
-    large: string;
-  };
+  image?: string;
 }
 
 const API_URL = "https://api.tcgdex.net/v2/en";
 
+let isFetching = false;
+let hasFetched = false;
+
 export async function fetchBaseSetCards() {
-  const response = await fetch(`${API_URL}/cards?set=base1`);
-  if (!response.ok) {
-    throw new Error("Failed to get API response");
+  // Prevent multiple simultaneous fetches
+  if (isFetching || hasFetched) {
+    return;
   }
-  const json = await response.json();
-  // Handle different possible response structures
-  const cards = Array.isArray(json) ? json : (json.data || json.cards || []);
-  
-  if (!Array.isArray(cards)) {
-    console.error("API response is not an array:", json);
-    throw new Error("Invalid API response format: expected an array of cards");
+
+  isFetching = true;
+
+  try {
+    const endpoint = `${API_URL}/cards?set=base1`;
+
+    let cards: any[] = [];
+
+    try {
+      const response = await fetch(endpoint);
+      if (!response.ok) {
+        return;
+      }
+
+      const json = await response.json();
+
+      // Handle different possible response structures
+      const extractedCards = Array.isArray(json)
+        ? json
+        : json.data || json.cards || [];
+
+      if (Array.isArray(extractedCards) && extractedCards.length > 0) {
+        cards = extractedCards;
+        return;
+      }
+    } catch (error) {
+      return;
+    }
+
+    if (cards.length === 0) {
+      throw new Error("Failed to fetch cards from all endpoints.");
+    }
+
+    await initExpansionCache(cards as Card[]);
+    hasFetched = true;
+  } catch (error) {
+    console.error("Error in fetchBaseSetCards:", error);
+    throw error;
+  } finally {
+    isFetching = false;
   }
-  
-  await initExpansionCache(cards as Card[]);
 }

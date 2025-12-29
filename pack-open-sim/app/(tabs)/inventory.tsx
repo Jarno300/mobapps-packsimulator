@@ -5,7 +5,7 @@ import {
   View,
   Image,
 } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
@@ -16,7 +16,21 @@ import { getCardCache } from "@/cache/setCardCache";
 export default function InventoryScreen() {
   const { player } = usePlayer();
   const [selectedTab, setSelectedTab] = useState<"packs" | "cards">("packs");
-  const cardCache = getCardCache();
+  const [cardCache, setCardCache] = useState<Card[]>([]);
+
+  useEffect(() => {
+    // Update card cache when component mounts
+    const cache = getCardCache();
+    setCardCache([...cache]);
+  }, []);
+
+  useEffect(() => {
+    // Update cache when switching to cards tab
+    if (selectedTab === "cards") {
+      const cache = getCardCache();
+      setCardCache([...cache]);
+    }
+  }, [selectedTab]);
 
   return (
     <ThemedView style={styles.container}>
@@ -76,17 +90,54 @@ export default function InventoryScreen() {
 
       {selectedTab === "cards" && (
         <ScrollView style={styles.content}>
-          <View style={styles.cardsGrid}>
-            {cardCache.map((card: Card) => (
-              <View key={card.id} style={styles.cardItem}>
-                <Image
-                  source={{ uri: card.images?.small }}
-                  style={styles.cardImage}
-                  resizeMode="contain"
-                />
-              </View>
-            ))}
-          </View>
+          {cardCache.length > 0 && cardCache[0] && !cardCache[0].image && (
+            <View style={styles.debugInfo}>
+              <ThemedText style={styles.debugText}>
+                Debug: First card image structure:{" "}
+                {JSON.stringify(cardCache[0].image || "No images property")}
+              </ThemedText>
+              <ThemedText style={styles.debugText}>
+                First card keys: {Object.keys(cardCache[0]).join(", ")}
+              </ThemedText>
+            </View>
+          )}
+          {cardCache.length === 0 ? (
+            <View style={styles.emptyState}>
+              <ThemedText style={styles.emptyStateText}>
+                No cards loaded yet. Cards are being fetched...
+              </ThemedText>
+              <ThemedText style={styles.emptyStateText}>
+                Cache size: {getCardCache().length}
+              </ThemedText>
+            </View>
+          ) : (
+            <View style={styles.cardsGrid}>
+              {cardCache.map((card: Card) => {
+                const imageUri = card.image;
+                return (
+                  <View key={card.id} style={styles.cardItem}>
+                    {imageUri ? (
+                      <Image
+                        source={{ uri: imageUri }}
+                        style={styles.cardImage}
+                        resizeMode="contain"
+                        onError={() => {}}
+                      />
+                    ) : (
+                      <View style={styles.cardPlaceholder}>
+                        <ThemedText
+                          style={styles.cardNameText}
+                          numberOfLines={2}
+                        >
+                          {card.name || "Unknown Card"}
+                        </ThemedText>
+                      </View>
+                    )}
+                  </View>
+                );
+              })}
+            </View>
+          )}
         </ScrollView>
       )}
     </ThemedView>
@@ -162,10 +213,55 @@ const styles = StyleSheet.create({
     width: "33.3333%", // 3 columns
     padding: 4,
     alignItems: "center",
+    minHeight: 120,
   },
   cardImage: {
     width: "100%",
     aspectRatio: 63 / 88, // typical card ratio, tweak if needed
     borderRadius: 4,
+    backgroundColor: "#f0f0f0",
+  },
+  cardPlaceholder: {
+    width: "100%",
+    aspectRatio: 63 / 88,
+    backgroundColor: "#e0e0e0",
+    borderRadius: 4,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 8,
+    borderWidth: 1,
+    borderColor: "#ccc",
+  },
+  cardNameText: {
+    textAlign: "center",
+    fontSize: 10,
+    fontWeight: "bold",
+  },
+  emptyState: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 40,
+  },
+  emptyStateText: {
+    textAlign: "center",
+    opacity: 0.6,
+    marginBottom: 10,
+  },
+  refreshButton: {
+    marginTop: 20,
+    padding: 12,
+    backgroundColor: "rgba(10, 126, 164, 0.2)",
+    borderRadius: 8,
+  },
+  debugInfo: {
+    padding: 10,
+    backgroundColor: "rgba(255, 255, 0, 0.1)",
+    marginBottom: 10,
+    borderRadius: 4,
+  },
+  debugText: {
+    fontSize: 12,
+    marginBottom: 4,
   },
 });
