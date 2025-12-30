@@ -4,9 +4,11 @@ import {
   TouchableOpacity,
   View,
   Image,
+  Pressable,
 } from "react-native";
 import { useState, useEffect } from "react";
 
+import { useRouter } from "expo-router";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Player, usePlayer } from "@/contexts/player-context";
@@ -198,18 +200,29 @@ function renderCardList(
 }
 
 function renderPackInventory(player: Player) {
+  const router = useRouter();
+
   return (
     <ScrollView style={styles.content}>
       <View style={styles.packsGrid}>
         {Object.entries(player.packInventory).map(([packName, count]) => (
-          <View key={packName} style={styles.packItem}>
+          <Pressable
+            key={packName}
+            style={styles.packItem}
+            onPress={() =>
+              router.push({
+                pathname: "/(tabs)/inventory/pack-opening",
+                params: { packName },
+              })
+            }
+          >
             <View style={styles.packImagePlaceholder}>
               <ThemedText style={styles.packNameText}>{packName}</ThemedText>
             </View>
             <ThemedText type="defaultSemiBold" style={styles.count}>
               x{count}
             </ThemedText>
-          </View>
+          </Pressable>
         ))}
       </View>
     </ScrollView>
