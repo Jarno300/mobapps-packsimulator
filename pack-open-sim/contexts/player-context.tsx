@@ -1,3 +1,4 @@
+import { BoosterPack } from "@/components/pokémon-related-components/booster-pack";
 import {
   createContext,
   useContext,
@@ -20,9 +21,7 @@ export interface Player {
     rare: number;
     holoRare: number;
   };
-  packInventory: {
-    [key: string]: number;
-  };
+  packInventory: BoosterPack[];
   collectedCardsIdList: Array<number>;
 }
 
@@ -39,7 +38,7 @@ const defaultPlayer: Player = {
     rare: 0,
     holoRare: 0,
   },
-  packInventory: {},
+  packInventory: [],
   collectedCardsIdList: [],
 };
 
