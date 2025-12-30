@@ -23,9 +23,7 @@ export interface Player {
   packInventory: {
     [key: string]: number;
   };
-  collectedCards: {
-    [key: string]: number[];
-  };
+  collectedCardsIdList: Array<number>;
 }
 
 const defaultPlayer: Player = {
@@ -41,12 +39,8 @@ const defaultPlayer: Player = {
     rare: 0,
     holoRare: 0,
   },
-  packInventory: {
-    "Base Pack": 0,
-  },
-  collectedCards: {
-    "Base Pack": [],
-  },
+  packInventory: {},
+  collectedCardsIdList: [],
 };
 
 interface PlayerContextValue {

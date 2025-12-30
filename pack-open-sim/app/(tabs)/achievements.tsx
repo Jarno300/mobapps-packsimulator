@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import Achievement from "@/components/achievement";
+import Achievement from "@/components/pokémon-related-components/achievement";
 
 export default function AchievementsScreen() {
   return (
