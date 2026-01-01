@@ -11,13 +11,9 @@ export default function ShopScreen() {
   const buyBasePack = (name: string, imageSource: string) => {
     if (player.money >= 500) {
       const newPack = createBoosterPack(name, imageSource);
-      const currentPacks = player.packInventory.push(newPack);
       updatePlayer({
         money: player.money - 500,
-        packInventory: {
-          ...player.packInventory,
-          [name]: currentPacks + 1,
-        },
+        packInventory: [...player.packInventory, newPack],
       });
 
     }

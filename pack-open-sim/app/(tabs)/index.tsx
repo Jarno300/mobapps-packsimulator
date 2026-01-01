@@ -69,7 +69,7 @@ export default function HomeScreen() {
                 Collected Cards
               </ThemedText>
               <ThemedText>
-                {player.collectedCards.length} / 102 cards collected
+                {player.collectedCardsIdList.length} / 102 cards collected
               </ThemedText>
             </ThemedView>
           </ThemedView>

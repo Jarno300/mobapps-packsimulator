@@ -27,6 +27,7 @@ export default function InventoryScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+
   useEffect(() => {
     const checkCache = () => {
       const cache = getCardCache();
@@ -84,7 +85,7 @@ export default function InventoryScreen() {
       </ThemedText>
       {renderInventoryTabs(selectedTab, setSelectedTab)}
 
-      {selectedTab === "packs" && renderPackInventory(player)}
+      {selectedTab === "packs" && PackInventory(player)}
 
       {selectedTab === "cards" &&
         renderCardList(cardCache, isLoading, error, handleRetry)}
@@ -199,28 +200,33 @@ function renderCardList(
   );
 }
 
-function renderPackInventory(player: Player) {
+function PackInventory(player: Player) {
   const router = useRouter();
+
 
   return (
     <ScrollView style={styles.content}>
       <View style={styles.packsGrid}>
-        {Object.entries(player.packInventory).map(([packName, count]) => (
+        {player.packInventory.map((pack) => (
           <Pressable
-            key={packName}
+            key={pack.id}
             style={styles.packItem}
             onPress={() =>
               router.push({
                 pathname: "/(tabs)/inventory/pack-opening",
-                params: { packName },
+                params: { packId: String(pack.id) }, // of packName: pack.name
               })
             }
           >
             <View style={styles.packImagePlaceholder}>
-              <ThemedText style={styles.packNameText}>{packName}</ThemedText>
+
+              <ThemedText style={styles.packNameText}>{pack.name}</ThemedText>
+
             </View>
+
+
             <ThemedText type="defaultSemiBold" style={styles.count}>
-              x{count}
+              {pack.isOpened ? "Opened" : "Sealed"}
             </ThemedText>
           </Pressable>
         ))}
@@ -228,6 +234,7 @@ function renderPackInventory(player: Player) {
     </ScrollView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
