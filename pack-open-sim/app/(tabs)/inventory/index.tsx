@@ -218,11 +218,15 @@ function PackInventory(player: Player) {
               })
             }
           >
-            <View style={styles.packImagePlaceholder}>
+            <Image
+              source={pack.image}
+              style={styles.boosterPackStyle}
+            />
 
-              <ThemedText style={styles.packNameText}>{pack.name}</ThemedText>
 
-            </View>
+
+
+
 
 
             <ThemedText type="defaultSemiBold" style={styles.count}>
@@ -365,4 +369,15 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(10, 126, 164, 0.2)",
     borderRadius: 8,
   },
+
+  boosterPackStyle: {
+    width: 100,
+    height: 180,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 8,
+    resizeMode: "contain",
+
+
+  }
 });
