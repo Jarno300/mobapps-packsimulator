@@ -1,9 +1,10 @@
-import { StyleSheet, TouchableOpacity, View, Image, ImageSourcePropType } from "react-native";
+import { StyleSheet, TouchableOpacity, View, Image, ImageSourcePropType, ScrollView } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { usePlayer } from "@/contexts/player-context";
 import { createBoosterPack } from "@/components/pokémon-related-components/booster-pack";
+
 
 export default function ShopScreen() {
   const { player, updatePlayer } = usePlayer();
@@ -29,75 +30,85 @@ export default function ShopScreen() {
           {player.money.toLocaleString()}
         </ThemedText>
       </View>
-
-      <View style={styles.packContainer}>
-        <TouchableOpacity
-          style={styles.packButton}
-          onPress={() =>
-            buyBasePack(
-              "Booster-Pack-Charizard",
-              require("@/assets/images/Booster-Pack-Charizard.png")
-            )
-          }
-          disabled={player.money < 500}
-        >
-          <Image
-            source={require("@/assets/images/Booster-Pack-Charizard.png")}
-            style={styles.imagePlaceholder}
-          />
-        </TouchableOpacity>
-        <View style={styles.priceContainer}>
-          <ThemedText type="defaultSemiBold" style={styles.price}>
-            500
-          </ThemedText>
+      <ScrollView>
+        <View style={styles.packContainer}>
+          <TouchableOpacity
+            style={styles.packButton}
+            onPress={() =>
+              buyBasePack(
+                "Booster-Pack-Charizard",
+                require("@/assets/images/Booster-Pack-Charizard.png")
+              )
+            }
+            disabled={player.money < 500}
+          >
+            <Image
+              source={require("@/assets/images/Booster-Pack-Charizard.png")}
+              style={styles.imagePlaceholder}
+            />
+          </TouchableOpacity>
+          <View style={styles.priceContainer}>
+            <ThemedText type="defaultSemiBold" style={styles.price}>
+              500
+            </ThemedText>
+            <Image source={require("@/assets/images/pokecoin.png")}
+              style={styles.priceContainerImage}
+            />
+          </View>
         </View>
-      </View>
 
-      <View style={styles.packContainer}>
-        <TouchableOpacity
-          style={styles.packButton}
-          onPress={() =>
-            buyBasePack(
-              "Booster-Pack-Blastoise",
-              require("@/assets/images/Booster-Pack-Blastoise.png")
-            )
-          }
-          disabled={player.money < 500}
-        >
-          <Image
-            source={require("@/assets/images/Booster-Pack-Blastoise.png")}
-            style={styles.imagePlaceholder}
-          />
-        </TouchableOpacity>
-        <View style={styles.priceContainer}>
-          <ThemedText type="defaultSemiBold" style={styles.price}>
-            500
-          </ThemedText>
+        <View style={styles.packContainer}>
+          <TouchableOpacity
+            style={styles.packButton}
+            onPress={() =>
+              buyBasePack(
+                "Booster-Pack-Blastoise",
+                require("@/assets/images/Booster-Pack-Blastoise.png")
+              )
+            }
+            disabled={player.money < 500}
+          >
+            <Image
+              source={require("@/assets/images/Booster-Pack-Blastoise.png")}
+              style={styles.imagePlaceholder}
+            />
+          </TouchableOpacity>
+          <View style={styles.priceContainer}>
+            <ThemedText type="defaultSemiBold" style={styles.price}>
+              500
+            </ThemedText>
+            <Image source={require("@/assets/images/pokecoin.png")}
+              style={styles.priceContainerImage}
+            />
+          </View>
         </View>
-      </View>
 
-      <View style={styles.packContainer}>
-        <TouchableOpacity
-          style={styles.packButton}
-          onPress={() =>
-            buyBasePack(
-              "Booster-Pack-Bulbasaur",
-              require("@/assets/images/Booster-Pack-Bulbasaur.png")
-            )
-          }
-          disabled={player.money < 500}
-        >
-          <Image
-            source={require("@/assets/images/Booster-Pack-Bulbasaur.png")}
-            style={styles.imagePlaceholder}
-          />
-        </TouchableOpacity>
-        <View style={styles.priceContainer}>
-          <ThemedText type="defaultSemiBold" style={styles.price}>
-            500
-          </ThemedText>
+        <View style={styles.packContainer}>
+          <TouchableOpacity
+            style={styles.packButton}
+            onPress={() =>
+              buyBasePack(
+                "Booster-Pack-Bulbasaur",
+                require("@/assets/images/Booster-Pack-Bulbasaur.png")
+              )
+            }
+            disabled={player.money < 500}
+          >
+            <Image
+              source={require("@/assets/images/Booster-Pack-Bulbasaur.png")}
+              style={styles.imagePlaceholder}
+            />
+          </TouchableOpacity>
+          <View style={styles.priceContainer}>
+            <ThemedText type="defaultSemiBold" style={styles.price}>
+              500
+            </ThemedText>
+            <Image source={require("@/assets/images/pokecoin.png")}
+              style={styles.priceContainerImage}
+            />
+          </View>
         </View>
-      </View>
+      </ScrollView>
     </ThemedView>
   );
 }
@@ -137,8 +148,21 @@ const styles = StyleSheet.create({
   },
   priceContainer: {
     flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+
   },
+  priceContainerImage: {
+    width: 25,
+    height: 25,
+    resizeMode: "contain"
+  },
+
   price: {
     fontSize: 24,
+    alignSelf: "center"
   },
+
+
 });
