@@ -6,12 +6,14 @@ import {
   Image,
   Pressable,
 } from "react-native";
-import { useState, useEffect } from "react";
-
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "expo-router";
+
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { Player, usePlayer } from "@/contexts/player-context";
+import { EmptyState } from "@/components/ui/empty-state";
+import { ErrorState } from "@/components/ui/error-state";
+import { usePlayer } from "@/contexts/player-context";
 import {
   Card,
   getFetchStatus,
@@ -19,222 +21,304 @@ import {
   fetchBaseSetCards,
 } from "@/api/fetchCards";
 import { getCardCache } from "@/cache/setCardCache";
+import { BoosterPack } from "@/components/pokémon-related-components/booster-pack";
 
-export default function InventoryScreen() {
-  const { player } = usePlayer();
-  const [selectedTab, setSelectedTab] = useState<"packs" | "cards">("packs");
-  const [cardCache, setCardCache] = useState<Card[]>([]);
+// =============================================================================
+// Types
+// =============================================================================
+
+type TabType = "packs" | "cards";
+
+interface TabButtonProps {
+  label: string;
+  isActive: boolean;
+  onPress: () => void;
+}
+
+interface CardGridProps {
+  cards: Card[];
+  ownedCards: Record<string, number>;
+  isLoading: boolean;
+  error: string | null;
+  onRetry: () => void;
+}
+
+interface PackGridProps {
+  packs: BoosterPack[];
+  onPackPress: (packId: number) => void;
+}
+
+// =============================================================================
+// Custom Hook: Card Cache Management
+// =============================================================================
+
+function useCardCache() {
+  const [cards, setCards] = useState<Card[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-
-  useEffect(() => {
-    const checkCache = () => {
-      const cache = getCardCache();
-      const status = getFetchStatus();
-
-      setIsLoading(status.isFetching);
-      setError(status.fetchError?.message || null);
-      setCardCache([...cache]);
-
-      // Stop polling once fetched or errored
-      if (status.hasFetched || status.fetchError) {
-        return true;
-      }
-      return false;
-    };
-
-    if (!checkCache()) {
-      // Poll until loaded
-      const interval = setInterval(() => {
-        if (checkCache()) {
-          clearInterval(interval);
-        }
-      }, 500);
-      return () => clearInterval(interval);
-    }
+  const refreshCache = useCallback(() => {
+    const cache = getCardCache();
+    setCards([...cache]);
   }, []);
 
-  useEffect(() => {
-    // Update cache when switching to cards tab
-    if (selectedTab === "cards") {
-      const cache = getCardCache();
-      setCardCache([...cache]);
-    }
-  }, [selectedTab]);
+  const checkStatus = useCallback(() => {
+    const status = getFetchStatus();
+    setIsLoading(status.isFetching);
+    setError(status.fetchError?.message || null);
+    refreshCache();
+    return status.hasFetched || status.fetchError !== null;
+  }, [refreshCache]);
 
-  const handleRetry = async () => {
+  const retry = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     resetFetchStatus();
     try {
       await fetchBaseSetCards();
-      const cache = getCardCache();
-      setCardCache([...cache]);
-      setIsLoading(false);
+      refreshCache();
     } catch (err) {
       setError((err as Error).message);
+    } finally {
       setIsLoading(false);
     }
-  };
+  }, [refreshCache]);
 
+  useEffect(() => {
+    if (!checkStatus()) {
+      const interval = setInterval(() => {
+        if (checkStatus()) {
+          clearInterval(interval);
+        }
+      }, 500);
+      return () => clearInterval(interval);
+    }
+  }, [checkStatus]);
+
+  return { cards, isLoading, error, retry, refreshCache };
+}
+
+// =============================================================================
+// Components
+// =============================================================================
+
+function TabButton({ label, isActive, onPress }: TabButtonProps) {
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="title" style={styles.title}>
-        Inventory
+    <TouchableOpacity
+      style={[styles.tab, isActive && styles.tabActive]}
+      onPress={onPress}
+    >
+      <ThemedText
+        type="defaultSemiBold"
+        style={[styles.tabText, isActive && styles.tabTextActive]}
+      >
+        {label}
       </ThemedText>
-      {renderInventoryTabs(selectedTab, setSelectedTab)}
-
-      {selectedTab === "packs" && PackInventory(player)}
-
-      {selectedTab === "cards" &&
-        renderCardList(cardCache, isLoading, error, handleRetry)}
-    </ThemedView>
+    </TouchableOpacity>
   );
 }
 
-function renderInventoryTabs(selectedTab: string, setSelectedTab: any) {
+function InventoryTabs({
+  selectedTab,
+  onTabChange,
+}: {
+  selectedTab: TabType;
+  onTabChange: (tab: TabType) => void;
+}) {
   return (
     <View style={styles.tabs}>
-      <TouchableOpacity
-        style={[styles.tab, selectedTab === "packs" && styles.tabActive]}
-        onPress={() => setSelectedTab("packs")}
-      >
-        <ThemedText
-          type="defaultSemiBold"
-          style={[
-            styles.tabText,
-            selectedTab === "packs" && styles.tabTextActive,
-          ]}
-        >
-          Packs
-        </ThemedText>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.tab, selectedTab === "cards" && styles.tabActive]}
-        onPress={() => setSelectedTab("cards")}
-      >
-        <ThemedText
-          type="defaultSemiBold"
-          style={[
-            styles.tabText,
-            selectedTab === "cards" && styles.tabTextActive,
-          ]}
-        >
-          Cards
-        </ThemedText>
-      </TouchableOpacity>
+      <TabButton
+        label="Packs"
+        isActive={selectedTab === "packs"}
+        onPress={() => onTabChange("packs")}
+      />
+      <TabButton
+        label="Cards"
+        isActive={selectedTab === "cards"}
+        onPress={() => onTabChange("cards")}
+      />
     </View>
   );
 }
 
-function renderCardList(
-  cardCache: Card[],
-  isLoading: boolean,
-  error: string | null,
-  onRetry: () => void
-) {
-  if (isLoading) {
-    return (
-      <View style={styles.emptyState}>
-        <ThemedText style={styles.emptyStateText}>Loading cards...</ThemedText>
+function CardItem({ card, ownedCount }: { card: Card; ownedCount: number }) {
+  const isOwned = ownedCount > 0;
+
+  return (
+    <View style={styles.cardItem}>
+      <View style={styles.cardImageContainer}>
+        {card.image ? (
+          <Image
+            source={{ uri: card.image }}
+            style={[styles.cardImage, !isOwned && styles.cardImageUnowned]}
+            resizeMode="contain"
+          />
+        ) : (
+          <View
+            style={[styles.cardPlaceholder, !isOwned && styles.cardUnowned]}
+          >
+            <ThemedText style={styles.cardNameText} numberOfLines={2}>
+              {card.name || "Unknown Card"}
+            </ThemedText>
+          </View>
+        )}
+        {isOwned && (
+          <View style={styles.ownedBadge}>
+            <ThemedText style={styles.ownedBadgeText}>x{ownedCount}</ThemedText>
+          </View>
+        )}
       </View>
-    );
+    </View>
+  );
+}
+
+function CardGrid({
+  cards,
+  ownedCards,
+  isLoading,
+  error,
+  onRetry,
+}: CardGridProps) {
+  if (isLoading) {
+    return <EmptyState message="Loading cards..." />;
   }
 
   if (error) {
     return (
-      <View style={styles.emptyState}>
-        <ThemedText style={styles.errorText}>Failed to load cards</ThemedText>
-        <ThemedText style={styles.debugText}>{error}</ThemedText>
-        <TouchableOpacity style={styles.refreshButton} onPress={onRetry}>
-          <ThemedText>Retry</ThemedText>
-        </TouchableOpacity>
-      </View>
+      <ErrorState
+        message="Failed to load cards"
+        details={error}
+        onRetry={onRetry}
+      />
     );
   }
 
-  if (cardCache.length === 0) {
+  if (cards.length === 0) {
     return (
-      <View style={styles.emptyState}>
-        <ThemedText style={styles.emptyStateText}>
-          No cards available
-        </ThemedText>
-        <TouchableOpacity style={styles.refreshButton} onPress={onRetry}>
-          <ThemedText>Refresh</ThemedText>
-        </TouchableOpacity>
-      </View>
+      <EmptyState
+        message="No cards available"
+        onAction={onRetry}
+        actionLabel="Refresh"
+      />
     );
   }
+
+  const ownedCount = Object.keys(ownedCards).length;
 
   return (
     <ScrollView style={styles.content}>
       <View style={styles.cardsHeader}>
         <ThemedText style={styles.cardCount}>
-          {cardCache.length} cards loaded
+          {ownedCount} / {cards.length} cards collected
         </ThemedText>
       </View>
       <View style={styles.cardsGrid}>
-        {cardCache.map((card: Card) => {
-          const imageUri = card.image;
-          return (
-            <View key={card.id} style={styles.cardItem}>
-              {imageUri ? (
-                <Image
-                  source={{ uri: imageUri }}
-                  style={styles.cardImage}
-                  resizeMode="contain"
-                />
-              ) : (
-                <View style={styles.cardPlaceholder}>
-                  <ThemedText style={styles.cardNameText} numberOfLines={2}>
-                    {card.name || "Unknown Card"}
-                  </ThemedText>
-                </View>
-              )}
-            </View>
-          );
-        })}
-      </View>
-    </ScrollView>
-  );
-}
-
-function PackInventory(player: Player) {
-  const router = useRouter();
-
-
-  return (
-    <ScrollView style={styles.content}>
-      <View style={styles.packsGrid}>
-        {player.packInventory.map((pack) => (
-          <Pressable
-            key={pack.id}
-            style={styles.packItem}
-            onPress={() =>
-              router.push({
-                pathname: "/(tabs)/inventory/pack-opening",
-                params: { packId: String(pack.id) }, // of packName: pack.name
-              })
-            }
-          >
-            <View style={styles.packImagePlaceholder}>
-
-              <ThemedText style={styles.packNameText}>{pack.name}</ThemedText>
-
-            </View>
-
-
-            <ThemedText type="defaultSemiBold" style={styles.count}>
-              {pack.isOpened ? "Opened" : "Sealed"}
-            </ThemedText>
-          </Pressable>
+        {cards.map((card) => (
+          <CardItem
+            key={card.id}
+            card={card}
+            ownedCount={ownedCards[card.id] || 0}
+          />
         ))}
       </View>
     </ScrollView>
   );
 }
 
+function PackItem({
+  pack,
+  onPress,
+}: {
+  pack: BoosterPack;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable style={styles.packItem} onPress={onPress}>
+      <View style={styles.packImagePlaceholder}>
+        <ThemedText style={styles.packNameText}>{pack.name}</ThemedText>
+      </View>
+      <ThemedText type="defaultSemiBold" style={styles.packStatus}>
+        {pack.isOpened ? "Opened" : "Sealed"}
+      </ThemedText>
+    </Pressable>
+  );
+}
+
+function PackGrid({ packs, onPackPress }: PackGridProps) {
+  if (packs.length === 0) {
+    return <EmptyState message="No packs in inventory" />;
+  }
+
+  return (
+    <ScrollView style={styles.content}>
+      <View style={styles.packsGrid}>
+        {packs.map((pack) => (
+          <PackItem
+            key={pack.id}
+            pack={pack}
+            onPress={() => onPackPress(pack.id)}
+          />
+        ))}
+      </View>
+    </ScrollView>
+  );
+}
+
+// =============================================================================
+// Main Screen
+// =============================================================================
+
+export default function InventoryScreen() {
+  const router = useRouter();
+  const { player } = usePlayer();
+  const [selectedTab, setSelectedTab] = useState<TabType>("packs");
+  const { cards, isLoading, error, retry, refreshCache } = useCardCache();
+
+  // Refresh card cache when switching to cards tab
+  useEffect(() => {
+    if (selectedTab === "cards") {
+      refreshCache();
+    }
+  }, [selectedTab, refreshCache]);
+
+  const handlePackPress = useCallback(
+    (packId: number) => {
+      router.push({
+        pathname: "/(tabs)/inventory/pack-opening",
+        params: { packId: String(packId) },
+      });
+    },
+    [router]
+  );
+
+  return (
+    <ThemedView style={styles.container}>
+      <ThemedText type="title" style={styles.title}>
+        Inventory
+      </ThemedText>
+
+      <InventoryTabs selectedTab={selectedTab} onTabChange={setSelectedTab} />
+
+      {selectedTab === "packs" && (
+        <PackGrid packs={player.packInventory} onPackPress={handlePackPress} />
+      )}
+
+      {selectedTab === "cards" && (
+        <CardGrid
+          cards={cards}
+          ownedCards={player.ownedCards}
+          isLoading={isLoading}
+          error={error}
+          onRetry={retry}
+        />
+      )}
+    </ThemedView>
+  );
+}
+
+// =============================================================================
+// Styles
+// =============================================================================
 
 const styles = StyleSheet.create({
   container: {
@@ -244,6 +328,8 @@ const styles = StyleSheet.create({
   title: {
     marginBottom: 20,
   },
+
+  // Tabs
   tabs: {
     flexDirection: "row",
     gap: 12,
@@ -267,9 +353,13 @@ const styles = StyleSheet.create({
   tabTextActive: {
     opacity: 1,
   },
+
+  // Content
   content: {
     flex: 1,
   },
+
+  // Packs
   packsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -294,9 +384,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 12,
   },
-  count: {
+  packStatus: {
     fontSize: 16,
   },
+
+  // Cards
   cardsHeader: {
     marginBottom: 12,
   },
@@ -314,11 +406,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     minHeight: 120,
   },
+  cardImageContainer: {
+    width: "100%",
+    position: "relative",
+  },
   cardImage: {
     width: "100%",
     aspectRatio: 63 / 88,
     borderRadius: 4,
     backgroundColor: "#f0f0f0",
+  },
+  cardImageUnowned: {
+    opacity: 0.3,
   },
   cardPlaceholder: {
     width: "100%",
@@ -331,38 +430,28 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ccc",
   },
+  cardUnowned: {
+    opacity: 0.3,
+  },
   cardNameText: {
     textAlign: "center",
     fontSize: 10,
     fontWeight: "bold",
   },
-  emptyState: {
-    flex: 1,
-    justifyContent: "center",
+  ownedBadge: {
+    position: "absolute",
+    bottom: 4,
+    right: 4,
+    backgroundColor: "#4CAF50",
+    borderRadius: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    minWidth: 24,
     alignItems: "center",
-    paddingVertical: 40,
   },
-  emptyStateText: {
-    textAlign: "center",
-    opacity: 0.6,
-    marginBottom: 10,
-  },
-  errorText: {
-    textAlign: "center",
-    color: "#d32f2f",
+  ownedBadgeText: {
+    color: "#fff",
+    fontSize: 10,
     fontWeight: "bold",
-    marginBottom: 8,
-  },
-  debugText: {
-    fontSize: 12,
-    opacity: 0.6,
-    marginBottom: 16,
-    textAlign: "center",
-  },
-  refreshButton: {
-    marginTop: 20,
-    padding: 12,
-    backgroundColor: "rgba(10, 126, 164, 0.2)",
-    borderRadius: 8,
   },
 });

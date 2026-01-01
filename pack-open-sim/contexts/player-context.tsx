@@ -22,7 +22,7 @@ export interface Player {
     holoRare: number;
   };
   packInventory: BoosterPack[];
-  collectedCardsIdList: Array<number>;
+  ownedCards: Record<string, number>; // cardId -> quantity owned
 }
 
 const defaultPlayer: Player = {
@@ -39,7 +39,7 @@ const defaultPlayer: Player = {
     holoRare: 0,
   },
   packInventory: [],
-  collectedCardsIdList: [],
+  ownedCards: {},
 };
 
 interface PlayerContextValue {
@@ -57,7 +57,23 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     AsyncStorage.getItem(STORAGE_KEY).then((value) => {
       if (value) {
         try {
-          setPlayer({ ...defaultPlayer, ...JSON.parse(value) });
+          const parsed = JSON.parse(value);
+
+          // Migration: ensure packInventory is an array
+          if (parsed.packInventory && !Array.isArray(parsed.packInventory)) {
+            parsed.packInventory = [];
+          }
+
+          // Migration: ensure ownedCards is an object
+          if (
+            !parsed.ownedCards ||
+            typeof parsed.ownedCards !== "object" ||
+            Array.isArray(parsed.ownedCards)
+          ) {
+            parsed.ownedCards = {};
+          }
+
+          setPlayer({ ...defaultPlayer, ...parsed });
         } catch {
           setPlayer(defaultPlayer);
         }
