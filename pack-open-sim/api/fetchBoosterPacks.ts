@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BoosterPack, createBoosterPack } from '@/components/pokémon-related-components/booster-pack';
+import { ImageSourcePropType } from 'react-native';
 
 const STORAGE_KEY = "@booster_packs";
 
@@ -24,7 +25,7 @@ export const getPacksFromStorage = async (): Promise<BoosterPack[]> => {
 };
 
 
-export const addAndSaveNewPack = async (name: string, image: string) => {
+export const addAndSaveNewPack = async (name: string, image: ImageSourcePropType) => {
     const newPack = createBoosterPack(name, image);
 
     const currentPacks = await getPacksFromStorage();
