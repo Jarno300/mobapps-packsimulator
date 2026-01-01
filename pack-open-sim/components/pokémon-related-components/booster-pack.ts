@@ -1,16 +1,17 @@
 import { Card } from "@/api/fetchCards";
 import { getCardCache } from "@/cache/setCardCache";
+import type { ImageSourcePropType } from "react-native";
 
 export interface BoosterPack {
     id: number;
     name: string;
-    image?: string;
+    image?: ImageSourcePropType;
     cards: Card[];
     isOpened: boolean;
 
 }
 
-export const createBoosterPack = (name: string, image: string): BoosterPack => {
+export const createBoosterPack = (name: string, image: ImageSourcePropType): BoosterPack => {
     const cardList = getCardCache();
     const cardRandomizer: Card[] = [];
     for (let i = 0; i < 11; i++) {

@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity, View, Image } from "react-native";
+import { StyleSheet, TouchableOpacity, View, Image, ImageSourcePropType } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
@@ -8,7 +8,7 @@ import { createBoosterPack } from "@/components/pokémon-related-components/boos
 export default function ShopScreen() {
   const { player, updatePlayer } = usePlayer();
 
-  const buyBasePack = (name: string, imageSource: string) => {
+  const buyBasePack = (name: string, imageSource: ImageSourcePropType) => {
     if (player.money >= 500) {
       const newPack = createBoosterPack(name, imageSource);
       updatePlayer({
@@ -36,7 +36,7 @@ export default function ShopScreen() {
           onPress={() =>
             buyBasePack(
               "Booster-Pack-Charizard",
-              "@/assets/images/Booster-Pack-Charizard.png"
+              require("@/assets/images/Booster-Pack-Charizard.png")
             )
           }
           disabled={player.money < 500}
@@ -59,7 +59,7 @@ export default function ShopScreen() {
           onPress={() =>
             buyBasePack(
               "Booster-Pack-Blastoise",
-              "@/assets/images/Booster-Pack-Blastoise.png"
+              require("@/assets/images/Booster-Pack-Blastoise.png")
             )
           }
           disabled={player.money < 500}
@@ -82,7 +82,7 @@ export default function ShopScreen() {
           onPress={() =>
             buyBasePack(
               "Booster-Pack-Bulbasaur",
-              "@/assets/images/Booster-Pack-Bulbasaur.png"
+              require("@/assets/images/Booster-Pack-Bulbasaur.png")
             )
           }
           disabled={player.money < 500}

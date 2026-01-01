@@ -23,6 +23,12 @@ import {
 import { getCardCache } from "@/cache/setCardCache";
 import { BoosterPack } from "@/components/pokémon-related-components/booster-pack";
 
+const PACK_IMAGES: Record<string, ReturnType<typeof require>> = {
+  "Booster-Pack-Charizard": require("@/assets/images/Booster-Pack-Charizard.png"),
+  "Booster-Pack-Blastoise": require("@/assets/images/Booster-Pack-Blastoise.png"),
+  "Booster-Pack-Bulbasaur": require("@/assets/images/Booster-Pack-Bulbasaur.png"),
+};
+
 // =============================================================================
 // Types
 // =============================================================================
@@ -225,6 +231,7 @@ function CardGrid({
   );
 }
 
+// Replace the PackItem component with this:
 function PackItem({
   pack,
   onPress,
@@ -232,11 +239,17 @@ function PackItem({
   pack: BoosterPack;
   onPress: () => void;
 }) {
+  const packImage = PACK_IMAGES[pack.name];
+
   return (
     <Pressable style={styles.packItem} onPress={onPress}>
-      <View style={styles.packImagePlaceholder}>
-        <ThemedText style={styles.packNameText}>{pack.name}</ThemedText>
-      </View>
+      {packImage ? (
+        <Image source={packImage} style={styles.boosterPackImage} />
+      ) : (
+        <View style={styles.packImagePlaceholder}>
+          <ThemedText style={styles.packNameText}>{pack.name}</ThemedText>
+        </View>
+      )}
       <ThemedText type="defaultSemiBold" style={styles.packStatus}>
         {pack.isOpened ? "Opened" : "Sealed"}
       </ThemedText>
@@ -244,6 +257,7 @@ function PackItem({
   );
 }
 
+// Replace the broken PackGrid with this clean version:
 function PackGrid({ packs, onPackPress }: PackGridProps) {
   if (packs.length === 0) {
     return <EmptyState message="No packs in inventory" />;
@@ -327,6 +341,13 @@ const styles = StyleSheet.create({
   },
   title: {
     marginBottom: 20,
+  },
+  // Add this style (replace boosterPackStyle):
+  boosterPackImage: {
+    width: 100,
+    height: 180,
+    resizeMode: "contain",
+    marginBottom: 8,
   },
 
   // Tabs
