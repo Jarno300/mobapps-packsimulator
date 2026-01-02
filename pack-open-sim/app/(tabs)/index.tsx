@@ -58,13 +58,11 @@ function NameInputScreen({ onSubmit }: { onSubmit: (name: string) => void }) {
 function StatCard({
   label,
   value,
-  icon,
   accentColor,
   isDark,
 }: {
   label: string;
   value: string | number;
-  icon: string;
   accentColor: string;
   isDark: boolean;
 }) {
@@ -78,14 +76,6 @@ function StatCard({
         },
       ]}
     >
-      <View
-        style={[
-          styles.statIconContainer,
-          { backgroundColor: accentColor + "20" },
-        ]}
-      >
-        <Text style={[styles.statIcon, { color: accentColor }]}>{icon}</Text>
-      </View>
       <Text
         style={[styles.statLabel, { color: isDark ? "#8B8F96" : "#6B7280" }]}
       >
@@ -245,14 +235,12 @@ export default function HomeScreen() {
             <StatCard
               label="Money"
               value={`$${player.money.toLocaleString()}`}
-              icon="💰"
               accentColor="#10B981"
               isDark={isDark}
             />
             <StatCard
               label="Packs Opened"
               value={player.openedPacks}
-              icon="📦"
               accentColor="#F59E0B"
               isDark={isDark}
             />
