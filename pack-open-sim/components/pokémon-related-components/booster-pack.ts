@@ -43,13 +43,6 @@ export const createBoosterPack = (name: string, image: ImageSourcePropType): Boo
 
     });
 
-    console.log(rareList);
-    console.log(holoList);
-
-
-
-
-
     for (let i = 0; i < 2; i++) {
         const randomIndex = Math.floor(Math.random() * energyList.length);
         cardRandomizer.push(energyList[randomIndex]);
