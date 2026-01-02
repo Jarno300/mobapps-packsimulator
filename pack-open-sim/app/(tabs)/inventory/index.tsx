@@ -428,6 +428,7 @@ const styles = StyleSheet.create({
     width: "33.3333%",
     padding: 4,
     justifyContent: "center",
+
   },
   cardImageContainer: {
     width: "100%",
@@ -438,10 +439,12 @@ const styles = StyleSheet.create({
     height: "auto",
     aspectRatio: 63 / 88,
     borderRadius: 4,
-    // backgroundColor: "#f0f0f0",
+    backgroundColor: "#ECD556",
   },
   cardImageUnowned: {
     opacity: 1,
+    backgroundColor: "none"
+
   },
   cardPlaceholder: {
     width: "100%",
