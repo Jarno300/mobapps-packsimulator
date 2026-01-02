@@ -1,4 +1,6 @@
 import { View, Text, Image, StyleSheet } from "react-native";
+import { useTheme } from "@/contexts/theme-context";
+import { THEME_COLORS } from "@/constants/colors";
 
 interface MoneyDisplayProps {
   amount: number;
@@ -17,11 +19,19 @@ export function MoneyDisplay({
   size = "medium",
   textStyle,
 }: MoneyDisplayProps) {
+  const { isDark } = useTheme();
+  const colors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
   const dimensions = SIZES[size];
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.text, { fontSize: dimensions.font }, textStyle]}>
+      <Text
+        style={[
+          styles.text,
+          { fontSize: dimensions.font, color: colors.textPrimary },
+          textStyle,
+        ]}
+      >
         {amount.toLocaleString()}
       </Text>
       <Image
