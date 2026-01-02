@@ -139,17 +139,20 @@ function InventoryTabs({
 
 function CardItem({ card, ownedCount }: { card: Card; ownedCount: number }) {
   const isOwned = ownedCount > 0;
-  const router = useRouter(); // bovenaan file import { useRouter } from "expo-router";
+  const router = useRouter();
+  console.log(isOwned)
 
   return (
     <TouchableOpacity
       style={styles.cardItem}
-      onPress={() =>
+      onPress={() => {
+        if (!isOwned) return;
+
         router.push({
           pathname: "/(tabs)/inventory/card-info",
           params: { cardId: String(card.id) },
-        })
-      }
+        });
+      }}
     >
       <View style={styles.cardImageContainer}>
         {card.image ? (
