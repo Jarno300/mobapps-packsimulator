@@ -15,7 +15,7 @@ export interface CardInfoProps {
 }
 
 
-export function CardInfo({ card }: CardInfoProps) {
+export default function CardInfo({ card }: CardInfoProps) {
     return (
         <View>
             <ThemedText>hallo</ThemedText>
