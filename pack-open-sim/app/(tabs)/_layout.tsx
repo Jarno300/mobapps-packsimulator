@@ -1,4 +1,4 @@
-import { Tabs } from "expo-router";
+import { Tabs, usePathname } from "expo-router";
 import React from "react";
 import { View, StyleSheet } from "react-native";
 
@@ -6,13 +6,20 @@ import { HapticTab } from "@/components/haptic-tab";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { usePlayer } from "@/contexts/player-context";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const { player } = usePlayer();
+  const pathname = usePathname();
+
+  const isOnboarding = player.username === "DefaultPlayerName";
+  const isPackOpening = pathname.includes("pack-opening");
+  const hideChrome = isOnboarding || isPackOpening;
 
   return (
     <View style={styles.container}>
-      <View style={styles.header} />
+      {!hideChrome && <View style={styles.header} />}
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
@@ -20,10 +27,12 @@ export default function TabLayout() {
             Colors[colorScheme ?? "light"].tabIconDefault,
           headerShown: false,
           tabBarButton: HapticTab,
-          tabBarStyle: {
-            paddingTop: 8,
-            height: 70,
-          },
+          tabBarStyle: hideChrome
+            ? { display: "none" }
+            : {
+                paddingTop: 8,
+                height: 70,
+              },
         }}
       >
         <Tabs.Screen

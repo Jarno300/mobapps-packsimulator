@@ -4,8 +4,7 @@ export interface Card {
   id: string;
   name: string;
   localId?: string;
-  superType?: string;
-  subTypes?: string;
+  types?: Array<string>;
   rarity?: string;
   image?: string;
   holo?: boolean;
@@ -39,6 +38,7 @@ async function fetchCardDetails(cardId: string): Promise<Card | null> {
       name: card.name,
       localId: card.localId,
       rarity: card.rarity,
+      types: card.types,
       image: card.image ? `${card.image}/high.webp` : undefined,
       holo: card.variants?.holo ?? false,
     };
