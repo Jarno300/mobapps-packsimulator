@@ -145,8 +145,8 @@ function CardItem({ card, ownedCount }: { card: Card; ownedCount: number }) {
   return (
     <TouchableOpacity
       style={styles.cardItem}
+      disabled={!isOwned}
       onPress={() => {
-        if (!isOwned) return;
 
         router.push({
           pathname: "/(tabs)/inventory/card-info",
