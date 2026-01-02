@@ -8,34 +8,21 @@ import { usePlayer } from "@/contexts/player-context";
 import { Card } from "@/api/fetchCards";
 import { BoosterPack } from "@/components/pokémon-related-components/booster-pack";
 
-// =============================================================================
-// Constants
-// =============================================================================
-
 const PACK_IMAGES: Record<string, ReturnType<typeof require>> = {
   "Booster-Pack-Charizard": require("@/assets/images/Booster-Pack-Charizard.png"),
   "Booster-Pack-Blastoise": require("@/assets/images/Booster-Pack-Blastoise.png"),
   "Booster-Pack-Bulbasaur": require("@/assets/images/Booster-Pack-Bulbasaur.png"),
 };
 
-// =============================================================================
-// Types
-// =============================================================================
-
 type OpeningState =
   | { status: "sealed"; pack: BoosterPack }
   | { status: "revealing"; cards: Card[]; currentIndex: number }
   | { status: "not_found" };
 
-// =============================================================================
-// Custom Hook: Pack Opening Logic
-// =============================================================================
-
 function usePackOpening(packId: string | undefined) {
   const router = useRouter();
   const { player, updatePlayer } = usePlayer();
 
-  // Find the pack and store cards before any state changes
   const packData = useMemo(() => {
     if (!packId) return null;
     const pack = player.packInventory.find(
@@ -55,7 +42,6 @@ function usePackOpening(packId: string | undefined) {
 
     const { pack, cards } = packData;
 
-    // Update player state: remove pack, add cards, increment counter
     const updatedInventory = player.packInventory.filter(
       (p) => p.id !== pack.id
     );
@@ -71,7 +57,6 @@ function usePackOpening(packId: string | undefined) {
       ownedCards: updatedOwnedCards,
     });
 
-    // Start card reveal
     setRevealState({ isRevealing: true, cards, currentIndex: 0 });
   }, [packData, player, updatePlayer]);
 
@@ -80,7 +65,6 @@ function usePackOpening(packId: string | undefined) {
       if (prev.currentIndex < prev.cards.length - 1) {
         return { ...prev, currentIndex: prev.currentIndex + 1 };
       }
-      // All cards revealed
       router.back();
       return prev;
     });
@@ -103,10 +87,6 @@ function usePackOpening(packId: string | undefined) {
 
   return { state, openPack, revealNextCard };
 }
-
-// =============================================================================
-// Components
-// =============================================================================
 
 function PackNotFound() {
   return (

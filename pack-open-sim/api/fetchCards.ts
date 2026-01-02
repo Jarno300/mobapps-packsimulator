@@ -8,6 +8,7 @@ export interface Card {
   subTypes?: string;
   rarity?: string;
   image?: string;
+  holo?: boolean;
 }
 
 const API_URL = "https://api.tcgdex.net/v2/en";
@@ -39,6 +40,7 @@ async function fetchCardDetails(cardId: string): Promise<Card | null> {
       localId: card.localId,
       rarity: card.rarity,
       image: card.image ? `${card.image}/high.webp` : undefined,
+      holo: card.variants?.holo ?? false,
     };
   } catch (error) {
     console.warn(`Error fetching card ${cardId}:`, error);
