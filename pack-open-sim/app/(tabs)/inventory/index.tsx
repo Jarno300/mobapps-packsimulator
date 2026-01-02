@@ -52,7 +52,6 @@ interface PackGridProps {
   onPackPress: (packId: number) => void;
 }
 
-
 function useCardCache() {
   const [cards, setCards] = useState<Card[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -452,7 +451,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     // padding: 8,
     borderWidth: 1,
-
   },
   cardUnowned: {
     opacity: 0.3,
