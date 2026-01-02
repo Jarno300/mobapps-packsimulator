@@ -26,9 +26,15 @@ export default function ShopScreen() {
         <ThemedText type="title" style={styles.title}>
           Shop
         </ThemedText>
-        <ThemedText type="defaultSemiBold" style={styles.money}>
-          {player.money.toLocaleString()}
-        </ThemedText>
+        <View style={styles.totalMoneyAmount}>
+          <ThemedText type="defaultSemiBold" style={styles.money}>
+            {player.money.toLocaleString()}
+          </ThemedText>
+          <Image
+            source={require("@/assets/images/pokecoin.png")}
+            style={styles.totalAmountCoin}
+          />
+        </View>
       </View>
       <ScrollView>
         <View style={styles.packContainer}>
@@ -163,6 +169,22 @@ const styles = StyleSheet.create({
     fontSize: 24,
     alignSelf: "center"
   },
+  totalMoneyAmount: {
+    flex: 1,
+    flexDirection: "row",
+    alignContent: "center",
+    justifyContent: "flex-end",
+    gap: 3,
+
+  },
+
+  totalAmountCoin: {
+    width: 20,
+    height: 20,
+    resizeMode: "contain",
+    alignSelf: "center"
+
+  }
 
 
 });
