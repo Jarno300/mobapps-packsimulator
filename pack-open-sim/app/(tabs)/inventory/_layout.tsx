@@ -21,8 +21,8 @@ export default function InventoryLayout() {
       <Stack.Screen
         name="pack-opening"
         options={{
-          headerShown: true,
-          title: "Open Pack",
+          headerShown: false,
+          gestureEnabled: false,
         }}
       />
     </Stack>
