@@ -25,6 +25,51 @@ export function resetFetchStatus() {
   fetchError = null;
 }
 
+async function fetchCardDetails(cardId: string): Promise<Card | null> {
+  try {
+    const response = await fetch(`${API_URL}/cards/${cardId}`);
+    if (!response.ok) {
+      console.warn(`Failed to fetch card ${cardId}: ${response.status}`);
+      return null;
+    }
+    const card = await response.json();
+    return {
+      id: card.id,
+      name: card.name,
+      localId: card.localId,
+      rarity: card.rarity,
+      image: card.image ? `${card.image}/high.webp` : undefined,
+    };
+  } catch (error) {
+    console.warn(`Error fetching card ${cardId}:`, error);
+    return null;
+  }
+}
+
+async function fetchCardsInBatches(
+  cardIds: string[],
+  batchSize = 10
+): Promise<Card[]> {
+  const cards: Card[] = [];
+
+  for (let i = 0; i < cardIds.length; i += batchSize) {
+    const batch = cardIds.slice(i, i + batchSize);
+    const batchResults = await Promise.all(batch.map(fetchCardDetails));
+
+    for (const card of batchResults) {
+      if (card) {
+        cards.push(card);
+      }
+    }
+
+    if (i + batchSize < cardIds.length) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+  }
+
+  return cards;
+}
+
 export async function fetchBaseSetCards() {
   if (isFetching || hasFetched) {
     return;
@@ -34,7 +79,6 @@ export async function fetchBaseSetCards() {
   fetchError = null;
 
   try {
-    // Use the sets endpoint which returns card data with the set
     const endpoint = `${API_URL}/sets/base1`;
     const response = await fetch(endpoint);
 
@@ -43,23 +87,22 @@ export async function fetchBaseSetCards() {
     }
 
     const json = await response.json();
-
-    // TCGdex set endpoint returns { cards: [...] }
     const rawCards = json.cards || [];
 
     if (!Array.isArray(rawCards) || rawCards.length === 0) {
       throw new Error("No cards found in API response");
     }
 
-    // Normalize cards with full image URLs
-    const cards: Card[] = rawCards.map((card: any) => ({
-      id: card.id,
-      name: card.name,
-      localId: card.localId,
-      rarity: card.rarity,
-      // TCGdex now returns full image URL - just append quality suffix
-      image: card.image ? `${card.image}/high.webp` : undefined,
-    }));
+    console.log(
+      "Found",
+      rawCards.length,
+      "cards in set, fetching full details..."
+    );
+
+    const cardIds = rawCards.map((card: any) => card.id);
+    const cards = await fetchCardsInBatches(cardIds);
+
+    console.log("Fetched full details for", cards.length, "cards");
 
     await initExpansionCache(cards);
     hasFetched = true;
