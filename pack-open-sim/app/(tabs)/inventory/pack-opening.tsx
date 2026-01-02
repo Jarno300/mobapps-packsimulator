@@ -51,7 +51,6 @@ function usePackOpening(packId: string | undefined) {
       updatedOwnedCards[card.id] = (updatedOwnedCards[card.id] || 0) + 1;
     }
 
-    // Calculate rarity counts for opened cards
     const rarityCounts = {
       energy: 0,
       common: 0,
@@ -213,10 +212,6 @@ function CardRevealView({
   );
 }
 
-// =============================================================================
-// Main Screen
-// =============================================================================
-
 export default function PackOpeningScreen() {
   const { packId } = useLocalSearchParams<{ packId: string }>();
   const { state, openPack, revealNextCard } = usePackOpening(packId);
@@ -239,10 +234,6 @@ export default function PackOpeningScreen() {
   }
 }
 
-// =============================================================================
-// Styles
-// =============================================================================
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -258,7 +249,6 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
 
-  // Pack
   packImage: {
     width: 200,
     height: 340,
@@ -277,7 +267,6 @@ const styles = StyleSheet.create({
     padding: 20,
   },
 
-  // Card
   cardImage: {
     width: 250,
     height: 350,

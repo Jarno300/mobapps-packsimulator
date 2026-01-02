@@ -18,6 +18,28 @@ export default function AchievementsScreen() {
           });
         }}
       />
+      <Achievement
+        title="Pack Opener II"
+        subtitle="Open 10 packs - 1000$"
+        condition={(player) => player.openedPacks >= 10}
+        onClaim={({ player, updatePlayer }) => {
+          updatePlayer({
+            money: player.money + 1000,
+            achievements: [...player.achievements, "Pack Opener II"],
+          });
+        }}
+      />
+      <Achievement
+        title="Pack Opener III"
+        subtitle="Open 25 packs - 2500$"
+        condition={(player) => player.openedPacks >= 25}
+        onClaim={({ player, updatePlayer }) => {
+          updatePlayer({
+            money: player.money + 2500,
+            achievements: [...player.achievements, "Pack Opener III"],
+          });
+        }}
+      />
     </ThemedView>
   );
 }
