@@ -1,15 +1,63 @@
-import { ScrollView, StyleSheet, View } from "react-native";
+import { useState } from "react";
+import {
+  ScrollView,
+  StyleSheet,
+  View,
+  TextInput,
+  Pressable,
+  Text,
+} from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { usePlayer } from "@/contexts/player-context";
 
+function NameInputScreen({ onSubmit }: { onSubmit: (name: string) => void }) {
+  const [name, setName] = useState("");
+
+  const handleSubmit = () => {
+    if (name.trim()) {
+      onSubmit(name.trim());
+    }
+  };
+
+  return (
+    <View style={styles.nameScreenContainer}>
+      <Text style={styles.nameLabel}>Your name:</Text>
+      <TextInput
+        style={styles.nameInput}
+        value={name}
+        onChangeText={setName}
+        placeholder="Enter your name"
+        placeholderTextColor="rgba(255,255,255,0.5)"
+        autoFocus
+      />
+      <Pressable
+        style={[
+          styles.submitButton,
+          !name.trim() && styles.submitButtonDisabled,
+        ]}
+        onPress={handleSubmit}
+        disabled={!name.trim()}
+      >
+        <Text style={styles.submitButtonText}>Start</Text>
+      </Pressable>
+    </View>
+  );
+}
+
 export default function HomeScreen() {
-  const { player } = usePlayer();
+  const { player, updatePlayer } = usePlayer();
+
+  if (player.username === "DefaultPlayerName") {
+    return (
+      <NameInputScreen onSubmit={(name) => updatePlayer({ username: name })} />
+    );
+  }
+
   return (
     <ThemedView style={styles.container}>
       <ScrollView style={styles.content}>
-        <View style={styles.header} />
         <ThemedView style={styles.contentPadding}>
           <ThemedView style={styles.titleContainer}>
             <ThemedText type="title">
@@ -30,13 +78,6 @@ export default function HomeScreen() {
                 <ThemedText style={styles.statLabel}>Opened Packs</ThemedText>
                 <ThemedText type="defaultSemiBold" style={styles.statValue}>
                   {player.openedPacks}
-                </ThemedText>
-              </ThemedView>
-
-              <ThemedView style={styles.statItem}>
-                <ThemedText style={styles.statLabel}>Luck</ThemedText>
-                <ThemedText type="defaultSemiBold" style={styles.statValue}>
-                  {player.luck}
                 </ThemedText>
               </ThemedView>
             </View>
@@ -83,10 +124,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    height: 60,
-    backgroundColor: "#ff0000",
-  },
   content: {
     flex: 1,
   },
@@ -132,5 +169,41 @@ const styles = StyleSheet.create({
   },
   raritiesGrid: {
     gap: 6,
+  },
+  nameScreenContainer: {
+    flex: 1,
+    backgroundColor: "#ff0000",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 32,
+  },
+  nameLabel: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 20,
+  },
+  nameInput: {
+    width: "100%",
+    backgroundColor: "rgba(255,255,255,0.2)",
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 18,
+    color: "#fff",
+    marginBottom: 24,
+  },
+  submitButton: {
+    backgroundColor: "#fff",
+    paddingVertical: 14,
+    paddingHorizontal: 48,
+    borderRadius: 12,
+  },
+  submitButtonDisabled: {
+    opacity: 0.5,
+  },
+  submitButtonText: {
+    color: "#ff0000",
+    fontSize: 18,
+    fontWeight: "bold",
   },
 });
