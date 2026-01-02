@@ -47,17 +47,17 @@ const styles = StyleSheet.create({
 
     },
     image: {
-        width: 250,
-        height: 344,
+        width: 150,
+        height: 206,
         resizeMode: "contain",
-        marginTop: 15,
-        borderRadius: 10
+        marginTop: 5,
+        borderRadius: 6
 
     },
     title: {
         marginTop: 15,
         fontWeight: 600,
-        fontSize: 30
+        fontSize: 20
 
     }
 });
