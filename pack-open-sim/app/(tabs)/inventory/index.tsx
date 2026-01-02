@@ -22,7 +22,7 @@ import {
 } from "@/api/fetchCards";
 import { getCardCache } from "@/cache/setCardCache";
 import { BoosterPack } from "@/components/pokémon-related-components/booster-pack";
-import { CardInfo, CardInfoProps } from "./card-info";
+
 
 
 const PACK_IMAGES: Record<string, ReturnType<typeof require>> = {

@@ -25,7 +25,7 @@ export function resetFetchStatus() {
   fetchError = null;
 }
 
-async function fetchCardDetails(cardId: string): Promise<Card | null> {
+export async function fetchCardDetails(cardId: string): Promise<Card | null> {
   try {
     const response = await fetch(`${API_URL}/cards/${cardId}`);
     if (!response.ok) {
