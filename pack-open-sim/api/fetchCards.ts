@@ -29,7 +29,6 @@ export async function fetchCardDetails(cardId: string): Promise<Card | null> {
   try {
     const response = await fetch(`${API_URL}/cards/${cardId}`);
     if (!response.ok) {
-      console.warn(`Failed to fetch card ${cardId}: ${response.status}`);
       return null;
     }
     const card = await response.json();
@@ -42,8 +41,7 @@ export async function fetchCardDetails(cardId: string): Promise<Card | null> {
       image: card.image ? `${card.image}/high.webp` : undefined,
       holo: card.variants?.holo ?? false,
     };
-  } catch (error) {
-    console.warn(`Error fetching card ${cardId}:`, error);
+  } catch {
     return null;
   }
 }
@@ -95,22 +93,13 @@ export async function fetchBaseSetCards() {
       throw new Error("No cards found in API response");
     }
 
-    console.log(
-      "Found",
-      rawCards.length,
-      "cards in set, fetching full details..."
-    );
-
     const cardIds = rawCards.map((card: any) => card.id);
     const cards = await fetchCardsInBatches(cardIds);
-
-    console.log("Fetched full details for", cards.length, "cards");
 
     await initExpansionCache(cards);
     hasFetched = true;
   } catch (error) {
     fetchError = error as Error;
-    console.error("Error in fetchBaseSetCards:", error);
     throw error;
   } finally {
     isFetching = false;

@@ -13,6 +13,7 @@ import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
+import { PackImage } from "@/components/pack/pack-image";
 import { usePlayer } from "@/contexts/player-context";
 import {
   Card,
@@ -23,34 +24,7 @@ import {
 import { getCardCache } from "@/cache/setCardCache";
 import { BoosterPack } from "@/components/pokémon-related-components/booster-pack";
 
-
-
-const PACK_IMAGES: Record<string, ReturnType<typeof require>> = {
-  "Booster-Pack-Charizard": require("@/assets/images/Booster-Pack-Charizard.png"),
-  "Booster-Pack-Blastoise": require("@/assets/images/Booster-Pack-Blastoise.png"),
-  "Booster-Pack-Bulbasaur": require("@/assets/images/Booster-Pack-Bulbasaur.png"),
-};
-
 type TabType = "packs" | "cards";
-
-interface TabButtonProps {
-  label: string;
-  isActive: boolean;
-  onPress: () => void;
-}
-
-interface CardGridProps {
-  cards: Card[];
-  ownedCards: Record<string, number>;
-  isLoading: boolean;
-  error: string | null;
-  onRetry: () => void;
-}
-
-interface PackGridProps {
-  packs: BoosterPack[];
-  onPackPress: (packId: number) => void;
-}
 
 function useCardCache() {
   const [cards, setCards] = useState<Card[]>([]);
@@ -98,7 +72,15 @@ function useCardCache() {
   return { cards, isLoading, error, retry, refreshCache };
 }
 
-function TabButton({ label, isActive, onPress }: TabButtonProps) {
+function TabButton({
+  label,
+  isActive,
+  onPress,
+}: {
+  label: string;
+  isActive: boolean;
+  onPress: () => void;
+}) {
   return (
     <TouchableOpacity
       style={[styles.tab, isActive && styles.tabActive]}
@@ -140,14 +122,12 @@ function InventoryTabs({
 function CardItem({ card, ownedCount }: { card: Card; ownedCount: number }) {
   const isOwned = ownedCount > 0;
   const router = useRouter();
-  console.log(isOwned)
 
   return (
     <TouchableOpacity
       style={styles.cardItem}
       disabled={!isOwned}
       onPress={() => {
-
         router.push({
           pathname: "/(tabs)/inventory/card-info",
           params: { cardId: String(card.id) },
@@ -190,7 +170,13 @@ function CardGrid({
   isLoading,
   error,
   onRetry,
-}: CardGridProps) {
+}: {
+  cards: Card[];
+  ownedCards: Record<string, number>;
+  isLoading: boolean;
+  error: string | null;
+  onRetry: () => void;
+}) {
   if (isLoading) {
     return <EmptyState message="Loading cards..." />;
   }
@@ -237,7 +223,6 @@ function CardGrid({
   );
 }
 
-// Replace the PackItem component with this:
 function PackItem({
   pack,
   onPress,
@@ -245,17 +230,9 @@ function PackItem({
   pack: BoosterPack;
   onPress: () => void;
 }) {
-  const packImage = PACK_IMAGES[pack.name];
-
   return (
     <Pressable style={styles.packItem} onPress={onPress}>
-      {packImage ? (
-        <Image source={packImage} style={styles.boosterPackImage} />
-      ) : (
-        <View style={styles.packImagePlaceholder}>
-          <ThemedText style={styles.packNameText}>{pack.name}</ThemedText>
-        </View>
-      )}
+      <PackImage packName={pack.name} size="small" />
       <ThemedText type="defaultSemiBold" style={styles.packStatus}>
         {pack.isOpened ? "Opened" : "Sealed"}
       </ThemedText>
@@ -263,8 +240,13 @@ function PackItem({
   );
 }
 
-// Replace the broken PackGrid with this clean version:
-function PackGrid({ packs, onPackPress }: PackGridProps) {
+function PackGrid({
+  packs,
+  onPackPress,
+}: {
+  packs: BoosterPack[];
+  onPackPress: (packId: number) => void;
+}) {
   if (packs.length === 0) {
     return <EmptyState message="No packs in inventory" />;
   }
@@ -284,17 +266,12 @@ function PackGrid({ packs, onPackPress }: PackGridProps) {
   );
 }
 
-// =============================================================================
-// Main Screen
-// =============================================================================
-
 export default function InventoryScreen() {
   const router = useRouter();
   const { player } = usePlayer();
   const [selectedTab, setSelectedTab] = useState<TabType>("packs");
   const { cards, isLoading, error, retry, refreshCache } = useCardCache();
 
-  // Refresh card cache when switching to cards tab
   useEffect(() => {
     if (selectedTab === "cards") {
       refreshCache();
@@ -336,10 +313,6 @@ export default function InventoryScreen() {
   );
 }
 
-// =============================================================================
-// Styles
-// =============================================================================
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -348,15 +321,6 @@ const styles = StyleSheet.create({
   title: {
     marginBottom: 20,
   },
-  // Add this style (replace boosterPackStyle):
-  boosterPackImage: {
-    width: 100,
-    height: 180,
-    resizeMode: "contain",
-    marginBottom: 8,
-  },
-
-  // Tabs
   tabs: {
     flexDirection: "row",
     gap: 12,
@@ -380,13 +344,9 @@ const styles = StyleSheet.create({
   tabTextActive: {
     opacity: 1,
   },
-
-  // Content
   content: {
     flex: 1,
   },
-
-  // Packs
   packsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -396,26 +356,9 @@ const styles = StyleSheet.create({
     width: 120,
     alignItems: "center",
   },
-  packImagePlaceholder: {
-    width: 120,
-    height: 120,
-    backgroundColor: "#ccc",
-    borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 2,
-    borderColor: "#999",
-    marginBottom: 8,
-  },
-  packNameText: {
-    textAlign: "center",
-    fontSize: 12,
-  },
   packStatus: {
     fontSize: 16,
   },
-
-  // Cards
   cardsHeader: {
     marginBottom: 12,
   },
@@ -431,7 +374,6 @@ const styles = StyleSheet.create({
     width: "33.3333%",
     padding: 4,
     justifyContent: "center",
-
   },
   cardImageContainer: {
     width: "100%",
@@ -446,8 +388,7 @@ const styles = StyleSheet.create({
   },
   cardImageUnowned: {
     opacity: 1,
-    backgroundColor: "none"
-
+    backgroundColor: "transparent",
   },
   cardPlaceholder: {
     width: "100%",
@@ -455,7 +396,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     justifyContent: "center",
     alignItems: "center",
-    // padding: 8,
     borderWidth: 1,
   },
   cardUnowned: {

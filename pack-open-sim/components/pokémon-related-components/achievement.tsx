@@ -1,39 +1,45 @@
 import { StyleSheet, View, Text, Pressable } from "react-native";
 import { Player, usePlayer } from "@/contexts/player-context";
 import { useTheme } from "@/contexts/theme-context";
+import { THEME_COLORS } from "@/constants/colors";
 
 type AchievementProps = {
   title: string;
   subtitle: string;
   condition: (player: Player) => boolean;
-  onClaim: (args: {
-    player: Player;
-    updatePlayer: (updates: Partial<Player>) => void;
-  }) => void;
+  onClaim: () => void;
   hideClaimed?: boolean;
 };
 
-export default function Achievement(props: AchievementProps) {
-  const { player, updatePlayer } = usePlayer();
+export default function Achievement({
+  title,
+  subtitle,
+  condition,
+  onClaim,
+  hideClaimed,
+}: AchievementProps) {
+  const { player } = usePlayer();
   const { isDark } = useTheme();
-  const isClaimed = player.achievements.includes(props.title);
-  const canClaim = props.condition(player) && !isClaimed;
+  const colors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
 
-  if (props.hideClaimed && isClaimed) {
+  const isClaimed = player.achievements.includes(title);
+  const canClaim = condition(player) && !isClaimed;
+
+  if (hideClaimed && isClaimed) {
     return null;
   }
 
   const getStatusColor = () => {
     if (isClaimed) return "#10B981";
     if (canClaim) return "#F59E0B";
-    return isDark ? "#4B5563" : "#9CA3AF";
+    return colors.textMuted;
   };
 
   const getButtonStyle = () => {
     if (isClaimed) {
       return {
-        backgroundColor: "#10B981" + "20",
-        borderColor: "#10B981" + "40",
+        backgroundColor: "#10B98120",
+        borderColor: "#10B98140",
       };
     }
     if (canClaim) {
@@ -48,6 +54,12 @@ export default function Achievement(props: AchievementProps) {
     };
   };
 
+  const getButtonTextColor = () => {
+    if (isClaimed) return "#10B981";
+    if (canClaim) return "#FFFFFF";
+    return colors.textMuted;
+  };
+
   const buttonStyle = getButtonStyle();
 
   return (
@@ -55,22 +67,18 @@ export default function Achievement(props: AchievementProps) {
       style={[
         styles.card,
         {
-          backgroundColor: isDark ? "#1E2024" : "#FFFFFF",
-          borderColor: isDark ? "#2A2D32" : "#E8E8E8",
+          backgroundColor: colors.card,
+          borderColor: colors.border,
         },
       ]}
     >
       <View style={styles.header}>
         <View style={styles.titleSection}>
-          <Text
-            style={[styles.title, { color: isDark ? "#FFFFFF" : "#1F2937" }]}
-          >
-            {props.title}
+          <Text style={[styles.title, { color: colors.textPrimary }]}>
+            {title}
           </Text>
-          <Text
-            style={[styles.subtitle, { color: isDark ? "#8B8F96" : "#6B7280" }]}
-          >
-            {props.subtitle}
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+            {subtitle}
           </Text>
         </View>
         <View
@@ -87,23 +95,10 @@ export default function Achievement(props: AchievementProps) {
           },
           !canClaim && !isClaimed && styles.buttonDisabled,
         ]}
-        onPress={() => props.onClaim({ player, updatePlayer })}
+        onPress={onClaim}
         disabled={!canClaim}
       >
-        <Text
-          style={[
-            styles.buttonText,
-            {
-              color: isClaimed
-                ? "#10B981"
-                : canClaim
-                ? "#FFFFFF"
-                : isDark
-                ? "#6B7280"
-                : "#9CA3AF",
-            },
-          ]}
-        >
+        <Text style={[styles.buttonText, { color: getButtonTextColor() }]}>
           {isClaimed ? "Claimed" : canClaim ? "Claim Reward" : "Locked"}
         </Text>
       </Pressable>

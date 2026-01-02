@@ -22,7 +22,7 @@ export interface Player {
     holoRare: number;
   };
   packInventory: BoosterPack[];
-  ownedCards: Record<string, number>; // cardId -> quantity owned
+  ownedCards: Record<string, number>;
 }
 
 const defaultPlayer: Player = {
@@ -59,12 +59,10 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
         try {
           const parsed = JSON.parse(value);
 
-          // Migration: ensure packInventory is an array
           if (parsed.packInventory && !Array.isArray(parsed.packInventory)) {
             parsed.packInventory = [];
           }
 
-          // Migration: ensure ownedCards is an object
           if (
             !parsed.ownedCards ||
             typeof parsed.ownedCards !== "object" ||
@@ -87,7 +85,6 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
   };
 
-  // browser console debugging: type window.player or window.updatePlayer({field: value})
   useEffect(() => {
     if (typeof window !== "undefined") {
       (window as any).player = player;

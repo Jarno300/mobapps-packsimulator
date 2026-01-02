@@ -1,28 +1,35 @@
 import { useState } from "react";
 import { ScrollView, StyleSheet, View, Text, Switch } from "react-native";
+
 import { useTheme } from "@/contexts/theme-context";
+import { usePlayer } from "@/contexts/player-context";
 import Achievement from "@/components/pokémon-related-components/achievement";
+import { ACHIEVEMENTS } from "@/constants/achievements";
+import { THEME_COLORS } from "@/constants/colors";
 
 export default function AchievementsScreen() {
   const { isDark } = useTheme();
+  const { player, updatePlayer } = usePlayer();
   const [hideClaimed, setHideClaimed] = useState(false);
 
+  const colors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
+
+  const handleClaim = (title: string, reward: number) => {
+    updatePlayer({
+      money: player.money + reward,
+      achievements: [...player.achievements, title],
+    });
+  };
+
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: isDark ? "#121316" : "#F3F4F6" },
-      ]}
-    >
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.content}>
           <View style={styles.header}>
-            <Text
-              style={[styles.title, { color: isDark ? "#FFFFFF" : "#1F2937" }]}
-            >
+            <Text style={[styles.title, { color: colors.textPrimary }]}>
               Achievements
             </Text>
           </View>
@@ -31,17 +38,12 @@ export default function AchievementsScreen() {
             style={[
               styles.filterCard,
               {
-                backgroundColor: isDark ? "#1E2024" : "#FFFFFF",
-                borderColor: isDark ? "#2A2D32" : "#E8E8E8",
+                backgroundColor: colors.card,
+                borderColor: colors.border,
               },
             ]}
           >
-            <Text
-              style={[
-                styles.filterLabel,
-                { color: isDark ? "#FFFFFF" : "#1F2937" },
-              ]}
-            >
+            <Text style={[styles.filterLabel, { color: colors.textPrimary }]}>
               Hide claimed
             </Text>
             <Switch
@@ -53,123 +55,16 @@ export default function AchievementsScreen() {
             />
           </View>
 
-          <Achievement
-            hideClaimed={hideClaimed}
-            title="Pack Opener I"
-            subtitle="Open 5 packs - 500$"
-            condition={(player) => player.openedPacks >= 5}
-            onClaim={({ player, updatePlayer }) => {
-              updatePlayer({
-                money: player.money + 500,
-                achievements: [...player.achievements, "Pack Opener I"],
-              });
-            }}
-          />
-          <Achievement
-            hideClaimed={hideClaimed}
-            title="Pack Opener II"
-            subtitle="Open 10 packs - 1000$"
-            condition={(player) => player.openedPacks >= 10}
-            onClaim={({ player, updatePlayer }) => {
-              updatePlayer({
-                money: player.money + 1000,
-                achievements: [...player.achievements, "Pack Opener II"],
-              });
-            }}
-          />
-          <Achievement
-            hideClaimed={hideClaimed}
-            title="Pack Opener III"
-            subtitle="Open 25 packs - 2500$"
-            condition={(player) => player.openedPacks >= 25}
-            onClaim={({ player, updatePlayer }) => {
-              updatePlayer({
-                money: player.money + 2500,
-                achievements: [...player.achievements, "Pack Opener III"],
-              });
-            }}
-          />
-          <Achievement
-            hideClaimed={hideClaimed}
-            title="Pack Opener IV"
-            subtitle="Open 50 packs - 5000$"
-            condition={(player) => player.openedPacks >= 50}
-            onClaim={({ player, updatePlayer }) => {
-              updatePlayer({
-                money: player.money + 5000,
-                achievements: [...player.achievements, "Pack Opener IV"],
-              });
-            }}
-          />
-          <Achievement
-            hideClaimed={hideClaimed}
-            title="Pack Opener V"
-            subtitle="Open 100 packs - 10000$"
-            condition={(player) => player.openedPacks >= 25}
-            onClaim={({ player, updatePlayer }) => {
-              updatePlayer({
-                money: player.money + 10000,
-                achievements: [...player.achievements, "Pack Opener V"],
-              });
-            }}
-          />
-          <Achievement
-            hideClaimed={hideClaimed}
-            title="Holo Rare Collector I"
-            subtitle="Obtain 1 holo rare card - 500$"
-            condition={(player) => player.obtainedRaritiesTotal.holoRare >= 1}
-            onClaim={({ player, updatePlayer }) => {
-              updatePlayer({
-                money: player.money + 500,
-                achievements: [...player.achievements, "Holo Rare Collector I"],
-              });
-            }}
-          />
-          <Achievement
-            hideClaimed={hideClaimed}
-            title="Holo Rare Collector II"
-            subtitle="Obtain 5 holo rare cards - 1000$"
-            condition={(player) => player.obtainedRaritiesTotal.holoRare >= 5}
-            onClaim={({ player, updatePlayer }) => {
-              updatePlayer({
-                money: player.money + 1000,
-                achievements: [
-                  ...player.achievements,
-                  "Holo Rare Collector II",
-                ],
-              });
-            }}
-          />
-          <Achievement
-            hideClaimed={hideClaimed}
-            title="Holo Rare Collector III"
-            subtitle="Obtain 10 holo rare cards - 1500$"
-            condition={(player) => player.obtainedRaritiesTotal.holoRare >= 10}
-            onClaim={({ player, updatePlayer }) => {
-              updatePlayer({
-                money: player.money + 1500,
-                achievements: [
-                  ...player.achievements,
-                  "Holo Rare Collector III",
-                ],
-              });
-            }}
-          />
-          <Achievement
-            hideClaimed={hideClaimed}
-            title="Holo Rare Collector IV"
-            subtitle="Obtain 20 holo rare cards - 2000$"
-            condition={(player) => player.obtainedRaritiesTotal.holoRare >= 20}
-            onClaim={({ player, updatePlayer }) => {
-              updatePlayer({
-                money: player.money + 2000,
-                achievements: [
-                  ...player.achievements,
-                  "Holo Rare Collector IV",
-                ],
-              });
-            }}
-          />
+          {ACHIEVEMENTS.map((achievement) => (
+            <Achievement
+              key={achievement.id}
+              hideClaimed={hideClaimed}
+              title={achievement.title}
+              subtitle={achievement.subtitle}
+              condition={achievement.condition}
+              onClaim={() => handleClaim(achievement.title, achievement.reward)}
+            />
+          ))}
         </View>
       </ScrollView>
     </View>
