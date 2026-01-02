@@ -22,6 +22,8 @@ import {
 } from "@/api/fetchCards";
 import { getCardCache } from "@/cache/setCardCache";
 import { BoosterPack } from "@/components/pokémon-related-components/booster-pack";
+import { CardInfo, CardInfoProps } from "./card-info";
+
 
 const PACK_IMAGES: Record<string, ReturnType<typeof require>> = {
   "Booster-Pack-Charizard": require("@/assets/images/Booster-Pack-Charizard.png"),
@@ -149,16 +151,25 @@ function InventoryTabs({
 
 function CardItem({ card, ownedCount }: { card: Card; ownedCount: number }) {
   const isOwned = ownedCount > 0;
+  const router = useRouter(); // bovenaan file import { useRouter } from "expo-router";
 
   return (
-    <View style={styles.cardItem}>
+    <TouchableOpacity
+      style={styles.cardItem}
+      onPress={() =>
+        router.push({
+          pathname: "/(tabs)/inventory/card-info",
+          params: { cardId: String(card.id) },
+        })
+      }
+    >
       <View style={styles.cardImageContainer}>
         {card.image ? (
           <Image
             source={
               isOwned
                 ? { uri: card.image }
-                : require('@/assets/images/Back-Of-Card.png')
+                : require("@/assets/images/Back-Of-Card.png")
             }
             style={[styles.cardImage, !isOwned && styles.cardImageUnowned]}
             resizeMode="contain"
@@ -178,7 +189,7 @@ function CardItem({ card, ownedCount }: { card: Card; ownedCount: number }) {
           </View>
         )}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
