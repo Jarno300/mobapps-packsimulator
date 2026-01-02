@@ -155,7 +155,11 @@ function CardItem({ card, ownedCount }: { card: Card; ownedCount: number }) {
       <View style={styles.cardImageContainer}>
         {card.image ? (
           <Image
-            source={{ uri: card.image }}
+            source={
+              isOwned
+                ? { uri: card.image }
+                : require('@/assets/images/Back-Of-Card.png')
+            }
             style={[styles.cardImage, !isOwned && styles.cardImageUnowned]}
             resizeMode="contain"
           />
@@ -424,8 +428,7 @@ const styles = StyleSheet.create({
   cardItem: {
     width: "33.3333%",
     padding: 4,
-    alignItems: "center",
-    minHeight: 120,
+    justifyContent: "center",
   },
   cardImageContainer: {
     width: "100%",
@@ -433,23 +436,23 @@ const styles = StyleSheet.create({
   },
   cardImage: {
     width: "100%",
+    height: "auto",
     aspectRatio: 63 / 88,
     borderRadius: 4,
-    backgroundColor: "#f0f0f0",
+    // backgroundColor: "#f0f0f0",
   },
   cardImageUnowned: {
-    opacity: 0.3,
+    opacity: 1,
   },
   cardPlaceholder: {
     width: "100%",
     aspectRatio: 63 / 88,
-    backgroundColor: "#e0e0e0",
     borderRadius: 4,
     justifyContent: "center",
     alignItems: "center",
-    padding: 8,
+    // padding: 8,
     borderWidth: 1,
-    borderColor: "#ccc",
+
   },
   cardUnowned: {
     opacity: 0.3,
