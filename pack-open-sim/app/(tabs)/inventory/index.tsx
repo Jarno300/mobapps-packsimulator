@@ -31,10 +31,6 @@ const PACK_IMAGES: Record<string, ReturnType<typeof require>> = {
   "Booster-Pack-Bulbasaur": require("@/assets/images/Booster-Pack-Bulbasaur.png"),
 };
 
-// =============================================================================
-// Types
-// =============================================================================
-
 type TabType = "packs" | "cards";
 
 interface TabButtonProps {
@@ -56,9 +52,6 @@ interface PackGridProps {
   onPackPress: (packId: number) => void;
 }
 
-// =============================================================================
-// Custom Hook: Card Cache Management
-// =============================================================================
 
 function useCardCache() {
   const [cards, setCards] = useState<Card[]>([]);
@@ -105,10 +98,6 @@ function useCardCache() {
 
   return { cards, isLoading, error, retry, refreshCache };
 }
-
-// =============================================================================
-// Components
-// =============================================================================
 
 function TabButton({ label, isActive, onPress }: TabButtonProps) {
   return (
