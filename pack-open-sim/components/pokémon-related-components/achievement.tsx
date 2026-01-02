@@ -2,6 +2,7 @@ import { StyleSheet, Button, View } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { Player, usePlayer } from "@/contexts/player-context";
+import { useTheme } from "@/contexts/theme-context";
 
 type AchievementProps = {
   title: string;
@@ -15,12 +16,17 @@ type AchievementProps = {
 
 export default function Achievement(props: AchievementProps) {
   const { player, updatePlayer } = usePlayer();
-  const canClaim =
-    props.condition(player) && !player.achievements.includes(props.title);
+  const { isDark } = useTheme();
+  const isClaimed = player.achievements.includes(props.title);
+  const canClaim = props.condition(player) && !isClaimed;
+
+  const cardBackgroundColor = isDark ? "#1E1E24" : "#F5F5F5";
 
   return (
     <View style={styles.shadowWrapper}>
-      <ThemedView style={styles.card}>
+      <ThemedView
+        style={[styles.card, { backgroundColor: cardBackgroundColor }]}
+      >
         <ThemedText type="title" style={styles.title}>
           {props.title}
         </ThemedText>
@@ -29,7 +35,7 @@ export default function Achievement(props: AchievementProps) {
         </ThemedText>
 
         <Button
-          title="Claim"
+          title={isClaimed ? "Claimed" : "Claim"}
           onPress={() => props.onClaim({ player, updatePlayer })}
           disabled={!canClaim}
         />
@@ -51,7 +57,6 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 12,
     padding: 16,
-    backgroundColor: "#1E1E24", // tweak for your theme
   },
   title: {
     marginBottom: 4,

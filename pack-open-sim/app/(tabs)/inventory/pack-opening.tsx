@@ -51,10 +51,45 @@ function usePackOpening(packId: string | undefined) {
       updatedOwnedCards[card.id] = (updatedOwnedCards[card.id] || 0) + 1;
     }
 
+    const rarityCounts = {
+      energy: 0,
+      common: 0,
+      uncommon: 0,
+      rare: 0,
+      holoRare: 0,
+    };
+    for (const card of cards) {
+      const rarity = card.rarity?.toLowerCase();
+      const isEnergy = card.name.toLowerCase().endsWith("energy");
+
+      if (isEnergy) {
+        rarityCounts.energy++;
+      } else if (rarity === "common") {
+        rarityCounts.common++;
+      } else if (rarity === "uncommon") {
+        rarityCounts.uncommon++;
+      } else if (rarity === "rare") {
+        if (card.holo) {
+          rarityCounts.holoRare++;
+        } else {
+          rarityCounts.rare++;
+        }
+      }
+    }
+
+    const updatedRaritiesTotal = {
+      energy: player.obtainedRaritiesTotal.energy + rarityCounts.energy,
+      common: player.obtainedRaritiesTotal.common + rarityCounts.common,
+      uncommon: player.obtainedRaritiesTotal.uncommon + rarityCounts.uncommon,
+      rare: player.obtainedRaritiesTotal.rare + rarityCounts.rare,
+      holoRare: player.obtainedRaritiesTotal.holoRare + rarityCounts.holoRare,
+    };
+
     updatePlayer({
       packInventory: updatedInventory,
       openedPacks: player.openedPacks + 1,
       ownedCards: updatedOwnedCards,
+      obtainedRaritiesTotal: updatedRaritiesTotal,
     });
 
     setRevealState({ isRevealing: true, cards, currentIndex: 0 });
@@ -177,10 +212,6 @@ function CardRevealView({
   );
 }
 
-// =============================================================================
-// Main Screen
-// =============================================================================
-
 export default function PackOpeningScreen() {
   const { packId } = useLocalSearchParams<{ packId: string }>();
   const { state, openPack, revealNextCard } = usePackOpening(packId);
@@ -203,10 +234,6 @@ export default function PackOpeningScreen() {
   }
 }
 
-// =============================================================================
-// Styles
-// =============================================================================
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -222,7 +249,6 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
 
-  // Pack
   packImage: {
     width: 200,
     height: 340,
@@ -241,7 +267,6 @@ const styles = StyleSheet.create({
     padding: 20,
   },
 
-  // Card
   cardImage: {
     width: 250,
     height: 350,

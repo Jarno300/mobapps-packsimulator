@@ -8,6 +8,7 @@ export async function initExpansionCache(cards: Card[]): Promise<void> {
   }
   cardCache.length = 0;
   cardCache.push(...cards);
+  console.log("cardCache", cardCache);
 }
 
 export function getCardCache(): Card[] {
