@@ -1,6 +1,25 @@
-import { View, StyleSheet, Image, Pressable } from "react-native";
-import { useState, useCallback, useMemo } from "react";
+import {
+  View,
+  StyleSheet,
+  Image,
+  Pressable,
+  Animated,
+  Easing,
+} from "react-native";
+import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
+
+const TYPE_COLORS: Record<string, { primary: string; secondary: string }> = {
+  Grass: { primary: "#7AC74C", secondary: "#5A9A3B" },
+  Fire: { primary: "#EE8130", secondary: "#C6611A" },
+  Water: { primary: "#6390F0", secondary: "#4A6FC2" },
+  Lightning: { primary: "#F7D02C", secondary: "#C9A820" },
+  Psychic: { primary: "#F95587", secondary: "#D13A6A" },
+  Fighting: { primary: "#C22E28", secondary: "#9C2420" },
+  Darkness: { primary: "#705746", secondary: "#4D3B30" },
+  Colorless: { primary: "#A8A77A", secondary: "#7A7A5C" },
+  default: { primary: "#68A090", secondary: "#4A7A6A" },
+};
 
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
@@ -200,15 +219,98 @@ function CardRevealView({
   const progressText = `Card ${currentIndex + 1} of ${cards.length}`;
   const actionText = isLastCard ? "Tap to finish" : "Tap to reveal next card";
 
-  return (
-    <ThemedView style={styles.container}>
-      <ThemedText style={styles.cardCounter}>{progressText}</ThemedText>
+  // Animation refs
+  const pulseAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
-      <Pressable onPress={onNext} style={styles.pressableContainer}>
-        <CardImage card={currentCard} />
-        <ThemedText style={styles.tapText}>{actionText}</ThemedText>
-      </Pressable>
-    </ThemedView>
+  // Get colors based on card type
+  const cardType = currentCard.types?.[0] || "default";
+  const typeColors = TYPE_COLORS[cardType] || TYPE_COLORS.default;
+
+  // Reset and start animations when card changes
+  useEffect(() => {
+    // Reset animations
+    fadeAnim.setValue(0);
+    pulseAnim.setValue(0);
+
+    // Fade in animation
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 400,
+      useNativeDriver: false,
+    }).start();
+
+    // Continuous pulse animation
+    const pulse = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 2000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: false,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 0,
+          duration: 2000,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: false,
+        }),
+      ])
+    );
+    pulse.start();
+
+    return () => pulse.stop();
+  }, [currentIndex, fadeAnim, pulseAnim]);
+
+  // Interpolate background color for pulsing effect
+  const backgroundColor = pulseAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [typeColors.primary, typeColors.secondary],
+  });
+
+  // Interpolate opacity for radial glow effect
+  const glowOpacity = pulseAnim.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [0.3, 0.6, 0.3],
+  });
+
+  const glowScale = pulseAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 1.2],
+  });
+
+  return (
+    <Animated.View style={[styles.revealContainer, { backgroundColor }]}>
+      {/* Animated glow effect */}
+      <Animated.View
+        style={[
+          styles.glowEffect,
+          {
+            opacity: glowOpacity,
+            transform: [{ scale: glowScale }],
+            backgroundColor: typeColors.primary,
+          },
+        ]}
+      />
+
+      <Animated.View style={[styles.cardContent, { opacity: fadeAnim }]}>
+        <ThemedText style={[styles.cardCounter, styles.lightText]}>
+          {progressText}
+        </ThemedText>
+
+        <Pressable onPress={onNext} style={styles.pressableContainer}>
+          <CardImage card={currentCard} />
+          <ThemedText style={[styles.tapText, styles.lightText]}>
+            {actionText}
+          </ThemedText>
+        </Pressable>
+
+        {/* Type badge */}
+        <View style={styles.typeBadge}>
+          <ThemedText style={styles.typeBadgeText}>{cardType}</ThemedText>
+        </View>
+      </Animated.View>
+    </Animated.View>
   );
 }
 
@@ -290,6 +392,47 @@ const styles = StyleSheet.create({
     fontSize: 16,
     opacity: 0.6,
     marginBottom: 16,
+  },
+
+  // Card Reveal View
+  revealContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    overflow: "hidden",
+  },
+  glowEffect: {
+    position: "absolute",
+    width: 400,
+    height: 400,
+    borderRadius: 200,
+  },
+  cardContent: {
+    alignItems: "center",
+    zIndex: 1,
+  },
+  lightText: {
+    color: "#FFFFFF",
+    textShadowColor: "rgba(0, 0, 0, 0.3)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+  },
+  typeBadge: {
+    marginTop: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.3)",
+  },
+  typeBadgeText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "600",
+    textTransform: "uppercase",
+    letterSpacing: 1,
   },
 
   // Shared

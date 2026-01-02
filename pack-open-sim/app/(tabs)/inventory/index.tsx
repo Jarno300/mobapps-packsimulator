@@ -22,8 +22,7 @@ import {
 } from "@/api/fetchCards";
 import { getCardCache } from "@/cache/setCardCache";
 import { BoosterPack } from "@/components/pokémon-related-components/booster-pack";
-import { CardInfo, CardInfoProps } from "./card-info";
-
+import CardInfo from "./card-info";
 
 const PACK_IMAGES: Record<string, ReturnType<typeof require>> = {
   "Booster-Pack-Charizard": require("@/assets/images/Booster-Pack-Charizard.png"),
@@ -51,7 +50,6 @@ interface PackGridProps {
   packs: BoosterPack[];
   onPackPress: (packId: number) => void;
 }
-
 
 function useCardCache() {
   const [cards, setCards] = useState<Card[]>([]);
@@ -452,7 +450,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     // padding: 8,
     borderWidth: 1,
-
   },
   cardUnowned: {
     opacity: 0.3,
