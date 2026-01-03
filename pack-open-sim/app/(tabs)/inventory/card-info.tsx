@@ -109,7 +109,8 @@ const styles = StyleSheet.create({
     },
     text: {
         fontSize: 15,
-        fontWeight: 500
+        fontWeight: 500,
+        alignSelf: "center"
     },
 
     typeContainer: {
@@ -161,6 +162,7 @@ const styles = StyleSheet.create({
         justifyContent: "flex-start",
         width: 200,
         marginBottom: 5,
+        height: 30
 
 
 
@@ -170,7 +172,6 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
-        marginBottom: 5,
 
     },
 
