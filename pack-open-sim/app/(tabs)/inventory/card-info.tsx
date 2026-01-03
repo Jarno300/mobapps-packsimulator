@@ -91,11 +91,15 @@ function holoCheckImageGenerator(holo: Boolean) {
 }
 
 function nameLengthChecker(name: string) {
-    if (name.length >= 14) {
+    if (name.length >= 17) {
+        if (name.length >= 20) {
+            return (<ThemedText style={[styles.verySmallText, styles.dynamicContent]}>{name.toUpperCase()}</ThemedText>)
+        }
         return (
             <ThemedText style={[styles.smallText, styles.dynamicContent]}>{name.toUpperCase()}</ThemedText>
         )
     }
+    return (<ThemedText style={[styles.text, styles.dynamicContent]}>{name.toUpperCase()}</ThemedText>)
 }
 
 const styles = StyleSheet.create({
@@ -134,7 +138,13 @@ const styles = StyleSheet.create({
         alignSelf: "center"
     },
     smallText: {
-        fontSize: 11,
+        fontSize: 12,
+        fontWeight: "500",
+        alignSelf: "center"
+    },
+
+    verySmallText: {
+        fontSize: 10,
         fontWeight: "500",
         alignSelf: "center"
     },
