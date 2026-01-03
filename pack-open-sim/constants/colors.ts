@@ -25,18 +25,18 @@ export const TYPE_COLORS: Record<
 export const THEME_COLORS = {
   dark: {
     background: "#121316",
-    card: "#1E2024",
-    border: "#2A2D32",
-    textPrimary: "#FFFFFF",
-    textSecondary: "#8B8F96",
+    card: "#2A2D32",
+    border: "#9CA3AF",
+    textPrimary: "#D1D5DB",
+    textSecondary: "#9CA3AF",
     textMuted: "#6B7280",
   },
   light: {
     background: "#F3F4F6",
-    card: "#FFFFFF",
-    border: "#E8E8E8",
-    textPrimary: "#1F2937",
-    textSecondary: "#6B7280",
-    textMuted: "#9CA3AF",
+    card: "#D1D5DB",
+    border: "#4B5563",
+    textPrimary: "#374151",
+    textSecondary: "#4B5563",
+    textMuted: "#6B7280",
   },
 };

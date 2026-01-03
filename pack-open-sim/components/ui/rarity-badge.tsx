@@ -1,14 +1,21 @@
-import { View, Text, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ImageSourcePropType,
+} from "react-native";
 import { THEME_COLORS } from "@/constants/colors";
+import { FONTS } from "@/constants/fonts";
 
 interface RarityBadgeProps {
   label: string;
   count: number;
-  color: string;
+  icon: ImageSourcePropType;
   isDark: boolean;
 }
 
-export function RarityBadge({ label, count, color, isDark }: RarityBadgeProps) {
+export function RarityBadge({ label, count, icon, isDark }: RarityBadgeProps) {
   const colors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
 
   return (
@@ -16,16 +23,16 @@ export function RarityBadge({ label, count, color, isDark }: RarityBadgeProps) {
       style={[
         styles.container,
         {
-          backgroundColor: color + "15",
-          borderColor: color + "40",
+          backgroundColor: colors.card,
+          borderColor: colors.border,
         },
       ]}
     >
-      <View style={[styles.dot, { backgroundColor: color }]} />
+      <Image source={icon} style={styles.icon} />
       <Text style={[styles.label, { color: colors.textSecondary }]}>
         {label}
       </Text>
-      <Text style={[styles.count, { color }]}>{count}</Text>
+      <Text style={[styles.count, { color: colors.textPrimary }]}>{count}</Text>
     </View>
   );
 }
@@ -36,21 +43,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 10,
     paddingHorizontal: 14,
-    borderRadius: 12,
+    borderRadius: 0,
     borderWidth: 1,
     gap: 8,
   },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+  icon: {
+    width: 16,
+    height: 16,
+    resizeMode: "contain",
   },
   label: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: 12,
+    fontFamily: FONTS.pokemon,
   },
   count: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: 14,
+    fontFamily: FONTS.pokemon,
   },
 });
