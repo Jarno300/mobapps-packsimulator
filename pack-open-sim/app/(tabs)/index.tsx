@@ -6,7 +6,15 @@ import { NameInputScreen } from "@/components/screens/name-input-screen";
 import { StatCard } from "@/components/ui/stat-card";
 import { RarityBadge } from "@/components/ui/rarity-badge";
 import { CollectionProgress } from "@/components/ui/collection-progress";
-import { RARITY_COLORS, THEME_COLORS } from "@/constants/colors";
+import { PokeBorder } from "@/components/ui/poke-border";
+import { THEME_COLORS } from "@/constants/colors";
+import { FONTS } from "@/constants/fonts";
+
+const RARITY_ICONS = {
+  common: require("@/assets/rarity-icons/501px-Rarity_Common.png"),
+  uncommon: require("@/assets/rarity-icons/501px-Rarity_Uncommon.png"),
+  rare: require("@/assets/rarity-icons/501px-Rarity_Rare.png"),
+};
 
 export default function HomeScreen() {
   const { player, updatePlayer } = usePlayer();
@@ -19,7 +27,6 @@ export default function HomeScreen() {
   }
 
   const colors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
-  const themeMode = isDark ? "dark" : "light";
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -29,16 +36,13 @@ export default function HomeScreen() {
             <Text
               style={[styles.welcomeLabel, { color: colors.textSecondary }]}
             >
-              Welcome back,
-            </Text>
-            <Text style={[styles.welcomeName, { color: colors.textPrimary }]}>
-              {player.username}
+              Welcome back, {player.username}!
             </Text>
           </View>
 
           <View style={styles.statsGrid}>
             <StatCard
-              label="Money"
+              label="Wallet"
               value={`$${player.money.toLocaleString()}`}
               isDark={isDark}
             />
@@ -55,51 +59,49 @@ export default function HomeScreen() {
             isDark={isDark}
           />
 
-          <View
-            style={[
-              styles.raritiesSection,
-              {
-                backgroundColor: colors.card,
-                borderColor: colors.border,
-              },
-            ]}
-          >
-            <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
-              Obtained Rarities
-            </Text>
-            <View style={styles.raritiesGrid}>
-              <RarityBadge
-                label="Energy"
-                count={player.obtainedRaritiesTotal.energy}
-                color={RARITY_COLORS.energy[themeMode]}
-                isDark={isDark}
-              />
-              <RarityBadge
-                label="Common"
-                count={player.obtainedRaritiesTotal.common}
-                color={RARITY_COLORS.common[themeMode]}
-                isDark={isDark}
-              />
-              <RarityBadge
-                label="Uncommon"
-                count={player.obtainedRaritiesTotal.uncommon}
-                color={RARITY_COLORS.uncommon[themeMode]}
-                isDark={isDark}
-              />
-              <RarityBadge
-                label="Rare"
-                count={player.obtainedRaritiesTotal.rare}
-                color={RARITY_COLORS.rare[themeMode]}
-                isDark={isDark}
-              />
-              <RarityBadge
-                label="Holo Rare"
-                count={player.obtainedRaritiesTotal.holoRare}
-                color={RARITY_COLORS.holoRare[themeMode]}
-                isDark={isDark}
-              />
+          <PokeBorder borderColor={colors.border}>
+            <View
+              style={[styles.raritiesContent, { backgroundColor: colors.card }]}
+            >
+              <Text
+                style={[styles.sectionTitle, { color: colors.textPrimary }]}
+              >
+                Obtained Rarities
+              </Text>
+              <View style={styles.raritiesGrid}>
+                <RarityBadge
+                  label="Energy"
+                  count={player.obtainedRaritiesTotal.energy}
+                  icon={RARITY_ICONS.common}
+                  isDark={isDark}
+                />
+                <RarityBadge
+                  label="Common"
+                  count={player.obtainedRaritiesTotal.common}
+                  icon={RARITY_ICONS.common}
+                  isDark={isDark}
+                />
+                <RarityBadge
+                  label="Uncommon"
+                  count={player.obtainedRaritiesTotal.uncommon}
+                  icon={RARITY_ICONS.uncommon}
+                  isDark={isDark}
+                />
+                <RarityBadge
+                  label="Rare"
+                  count={player.obtainedRaritiesTotal.rare}
+                  icon={RARITY_ICONS.rare}
+                  isDark={isDark}
+                />
+                <RarityBadge
+                  label="Holo Rare"
+                  count={player.obtainedRaritiesTotal.holoRare}
+                  icon={RARITY_ICONS.rare}
+                  isDark={isDark}
+                />
+              </View>
             </View>
-          </View>
+          </PokeBorder>
         </View>
       </ScrollView>
     </View>
@@ -121,28 +123,25 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   welcomeLabel: {
-    fontSize: 16,
-    fontWeight: "500",
+    fontSize: 14,
+    fontFamily: FONTS.pokemon,
     marginBottom: 4,
   },
   welcomeName: {
-    fontSize: 32,
-    fontWeight: "700",
-    letterSpacing: -0.5,
+    fontSize: 28,
+    fontFamily: FONTS.pokemon,
   },
   statsGrid: {
-    flexDirection: "row",
+    flexDirection: "column",
     gap: 12,
     marginBottom: 16,
   },
-  raritiesSection: {
+  raritiesContent: {
     padding: 20,
-    borderRadius: 16,
-    borderWidth: 1,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 16,
+    fontFamily: FONTS.pokemon,
     marginBottom: 16,
   },
   raritiesGrid: {

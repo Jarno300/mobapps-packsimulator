@@ -1,5 +1,7 @@
 import { View, Text, StyleSheet } from "react-native";
 import { THEME_COLORS } from "@/constants/colors";
+import { FONTS } from "@/constants/fonts";
+import { PokeBorder } from "./poke-border";
 
 interface CollectionProgressProps {
   collected: number;
@@ -16,52 +18,46 @@ export function CollectionProgress({
   const progress = (collected / total) * 100;
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          backgroundColor: colors.card,
-          borderColor: colors.border,
-        },
-      ]}
-    >
-      <View style={styles.header}>
-        <Text style={[styles.title, { color: colors.textPrimary }]}>
-          Collection Progress
-        </Text>
-        <Text style={[styles.count, { color: colors.textSecondary }]}>
-          {collected} / {total}
-        </Text>
-      </View>
-      <View
-        style={[
-          styles.track,
-          { backgroundColor: isDark ? "#2A2D32" : "#E5E7EB" },
-        ]}
-      >
+    <PokeBorder style={styles.borderContainer} borderColor={colors.border}>
+      <View style={[styles.content, { backgroundColor: colors.card }]}>
+        <View style={styles.header}>
+          <Text style={[styles.title, { color: colors.textPrimary }]}>
+            Collection Progress
+          </Text>
+          <Text style={[styles.count, { color: colors.textSecondary }]}>
+            {collected} / {total}
+          </Text>
+        </View>
         <View
           style={[
-            styles.fill,
-            {
-              width: `${progress}%`,
-              backgroundColor: progress === 100 ? "#10B981" : "#EF4444",
-            },
+            styles.track,
+            { backgroundColor: isDark ? "#1E2024" : "#9CA3AF" },
           ]}
-        />
+        >
+          <View
+            style={[
+              styles.fill,
+              {
+                width: `${progress}%`,
+                backgroundColor: progress === 100 ? "#10B981" : "#EF4444",
+              },
+            ]}
+          />
+        </View>
+        <Text style={[styles.percent, { color: colors.textSecondary }]}>
+          {progress.toFixed(1)}% complete
+        </Text>
       </View>
-      <Text style={[styles.percent, { color: colors.textSecondary }]}>
-        {progress.toFixed(1)}% complete
-      </Text>
-    </View>
+    </PokeBorder>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    borderRadius: 16,
-    borderWidth: 1,
+  borderContainer: {
     marginBottom: 16,
+  },
+  content: {
+    padding: 20,
   },
   header: {
     flexDirection: "row",
@@ -70,12 +66,12 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   title: {
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 16,
+    fontFamily: FONTS.pokemon,
   },
   count: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: 12,
+    fontFamily: FONTS.pokemon,
   },
   track: {
     height: 10,
@@ -88,7 +84,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   percent: {
-    fontSize: 13,
-    fontWeight: "500",
+    fontSize: 11,
+    fontFamily: FONTS.pokemon,
   },
 });
