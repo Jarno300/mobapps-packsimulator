@@ -30,11 +30,20 @@ export default function TabLayout() {
           tabBarStyle: hideChrome
             ? { display: "none" }
             : {
-                paddingTop: 8,
-                height: 70,
-              },
+              paddingTop: 8,
+              height: 70,
+            },
         }}
       >
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: "Home",
+            tabBarIcon: ({ color }) => (
+              <IconSymbol size={28} name="house.fill" color={color} />
+            ),
+          }}
+        />
         <Tabs.Screen
           name="inventory"
           options={{
@@ -54,15 +63,7 @@ export default function TabLayout() {
           }}
         />
 
-        <Tabs.Screen
-          name="index"
-          options={{
-            title: "Home",
-            tabBarIcon: ({ color }) => (
-              <IconSymbol size={28} name="house.fill" color={color} />
-            ),
-          }}
-        />
+
         <Tabs.Screen
           name="achievements"
           options={{
