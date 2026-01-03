@@ -1,13 +1,18 @@
 import { initExpansionCache } from "@/cache/setCardCache";
+import type { ImageSourcePropType } from "react-native";
 
 export interface Card {
   id: string;
   name: string;
   localId?: string;
-  types?: Array<string>;
+  types?: string[];
+  energyType?: string,
   rarity?: string;
   image?: string;
   holo?: boolean;
+  price?: Number;
+  typeLogos?: ImageSourcePropType[];
+
 }
 
 const API_URL = "https://api.tcgdex.net/v2/en";
@@ -32,14 +37,21 @@ export async function fetchCardDetails(cardId: string): Promise<Card | null> {
       return null;
     }
     const card = await response.json();
+
+    const types = typeAssigner(card)
+
     return {
       id: card.id,
       name: card.name,
       localId: card.localId,
       rarity: card.rarity,
-      types: card.types,
+      types: types,
+      energyType: card.energyType,
       image: card.image ? `${card.image}/high.webp` : undefined,
       holo: card.variants?.holo ?? false,
+      price: Number(Math.floor(card.pricing.cardmarket.avg)),
+      typeLogos: addPokemonTypeLogos(card)
+
     };
   } catch {
     return null;
@@ -104,4 +116,69 @@ export async function fetchBaseSetCards() {
   } finally {
     isFetching = false;
   }
+}
+
+function addPokemonTypeLogos(card: Card) {
+  console.log("add type")
+  const typeLogos: ImageSourcePropType[] = [];
+  if (card.types?.includes("Normal") || card.types?.includes("Colorless") || card.name.includes("Colorless Energy")) {
+    typeLogos.push(require("@/assets/images/normal-type.png"))
+  }
+  if (card.types?.includes("Fighting") || card.name.includes("Fighting Energy")) {
+    typeLogos.push(require("@/assets/images/fighting-type.png"))
+
+
+  }
+  if (card.types?.includes("Water") || card.name.includes("Water Energy")) {
+    typeLogos.push(require("@/assets/images/water-type.png"))
+
+
+  }
+  if (card.types?.includes("Electric") || card.name.includes("Electric Energy")) {
+    typeLogos.push(require("@/assets/images/electric-type.png"))
+
+
+  }
+  if (card.types?.includes("Fire") || card.name.includes("Fire Energy")) {
+    typeLogos.push(require("@/assets/images/fire-type.png"))
+
+
+  }
+  if (card.types?.includes("Psychic") || card.name.includes("Psychic Energy")) {
+    typeLogos.push(require("@/assets/images/psychic-type.png"))
+
+  }
+  if (card.types?.includes("Grass") || card.name.includes("Grass Energy")) {
+    typeLogos.push(require("@/assets/images/grass-type.png"))
+
+
+  }
+
+  return typeLogos
+}
+
+
+function typeAssigner(card: Card) {
+  card.types = card.types ?? [];
+  if (card.energyType) {
+    if (card.name.includes("Colorless Energy")) {
+      card.types?.push("Colorless");
+    }
+    if (card.name.includes("Fighting Energy")) {
+      card.types?.push("Fighting");
+    }
+    if (card.name.includes("Water Energy")) {
+      card.types?.push("Water");
+    }
+    if (card.name.includes("Electric Energy")) {
+      card.types?.push("Electric");
+    }
+    if (card.name.includes("Fire Energy")) {
+      card.types?.push("Fire");
+    }
+    if (card.name.includes("Psychic Energy")) {
+      card.types?.push("Psychic");
+    }
+  }
+  return card.types;
 }
