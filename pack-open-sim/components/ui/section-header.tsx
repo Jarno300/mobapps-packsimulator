@@ -1,5 +1,6 @@
 import { Text, StyleSheet } from "react-native";
 import { THEME_COLORS } from "@/constants/colors";
+import { FONTS } from "@/constants/fonts";
 
 interface SectionHeaderProps {
   title: string;
@@ -18,8 +19,8 @@ export function SectionHeader({ title, isDark }: SectionHeaderProps) {
 
 const styles = StyleSheet.create({
   header: {
-    fontSize: 13,
-    fontWeight: "600",
+    fontSize: 11,
+    fontFamily: FONTS.pokemon,
     letterSpacing: 0.5,
     marginBottom: 12,
     marginTop: 8,

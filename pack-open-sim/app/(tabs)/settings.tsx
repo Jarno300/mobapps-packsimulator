@@ -4,6 +4,7 @@ import { useTheme } from "@/contexts/theme-context";
 import { SettingCard } from "@/components/ui/setting-card";
 import { SectionHeader } from "@/components/ui/section-header";
 import { THEME_COLORS } from "@/constants/colors";
+import { FONTS } from "@/constants/fonts";
 
 export default function SettingsScreen() {
   const { setTheme, isDark } = useTheme();
@@ -70,12 +71,11 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   title: {
-    fontSize: 32,
-    fontWeight: "700",
-    letterSpacing: -0.5,
+    fontSize: 24,
+    fontFamily: FONTS.pokemon,
   },
   valueText: {
-    fontSize: 15,
-    fontWeight: "500",
+    fontSize: 12,
+    fontFamily: FONTS.pokemon,
   },
 });
