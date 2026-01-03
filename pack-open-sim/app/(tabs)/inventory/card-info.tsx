@@ -11,39 +11,45 @@ export default function CardInfoScreen() {
     const card = cardList.find((c) => String(c.id) === cardId);
     console.log(card)
     console.log(card?.typeLogos)
-    if (card && card.typeLogos && card.rarity && card.holo !== undefined) {
+    if (!card || !card.typeLogos || !card.rarity || card.holo === undefined) {
         return (
-            <ScrollView>
+            <View style={styles.container}>
+                <ThemedText>Card not found</ThemedText>
+            </View>
+        );
+    }
+    return (
+        <ScrollView>
 
-                <View style={styles.container}>
-                    <View style={styles.cardContainer}>
-                        <ThemedText style={styles.title}>{card?.name.toUpperCase()}</ThemedText>
-                        <Image source={{ uri: card?.image }} style={styles.image} />
-                    </View>
-                    <View style={styles.nameContainer}>
-                        <ThemedText style={styles.text}>NAME:</ThemedText>
-                        <ThemedText style={[styles.text, styles.name]}>{card.name.toUpperCase()}</ThemedText>
+            <View style={styles.container}>
+                <View style={styles.cardContainer}>
+                    <Image source={{ uri: card?.image }} style={styles.image} />
+                </View>
+                <View>
+                    <View style={styles.dynamicContentContainer}>
+                        <ThemedText style={[styles.text, styles.staticContent]}>NAME:</ThemedText>
+                        <ThemedText style={[styles.text, styles.dynamicContent]}>{card.name.toUpperCase()}</ThemedText>
                     </View>
                     <View style={styles.typeContainer}>
-                        <ThemedText style={styles.text}>TYPES: </ThemedText>
+                        <ThemedText style={[styles.text, styles.staticContent]}>TYPES: </ThemedText>
                         <View style={styles.typeImageContainer}>{typeImageGenerator(card?.typeLogos)}</View>
                     </View>
-                    <View style={styles.nameContainer}>
-                        <ThemedText style={styles.text}>RARITY:</ThemedText>
-                        <ThemedText style={[styles.text, styles.name]}>{card.rarity.toUpperCase()}</ThemedText>
+                    <View style={styles.dynamicContentContainer}>
+                        <ThemedText style={[styles.text, styles.staticContent]}>RARITY:</ThemedText>
+                        <ThemedText style={[styles.text, styles.dynamicContent]}>{card.rarity.toUpperCase()}</ThemedText>
                     </View>
 
                     <View style={styles.holoContainer}>
-                        <ThemedText style={styles.text}>HOLO:</ThemedText>
+                        <ThemedText style={[styles.text, styles.staticContent]}>HOLO:</ThemedText>
                         <View style={styles.holoImageContainer}>
                             {holoCheckImageGenerator(card.holo)}
                         </View>
                     </View>
-
                 </View>
-            </ScrollView>
-        );
-    }
+
+            </View>
+        </ScrollView>
+    );
 }
 
 function typeImageGenerator(typeImageList: ImageSourcePropType[]) {
@@ -84,23 +90,25 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "flex-start",
-        paddingTop: 0,
+        justifyContent: "center",
+        paddingTop: 20,
     },
 
     cardContainer: {
-        flex: 1,
         alignItems: "center",
         justifyContent: "flex-start",
         paddingTop: 0,
+        marginBottom: 20,
     },
     image: {
         width: 200,
-
+        height: 280,
         aspectRatio: 63 / 88,
         resizeMode: "contain",
         marginTop: 5,
         borderRadius: 6,
+
+
     },
     title: {
         marginTop: 15,
@@ -109,7 +117,7 @@ const styles = StyleSheet.create({
     },
     text: {
         fontSize: 15,
-        fontWeight: 500,
+        fontWeight: "500",
         alignSelf: "center"
     },
 
@@ -124,7 +132,7 @@ const styles = StyleSheet.create({
 
     },
 
-    nameContainer: {
+    dynamicContentContainer: {
         flexDirection: "row",
         width: 200,
         textAlign: "left",
@@ -135,9 +143,14 @@ const styles = StyleSheet.create({
 
     },
 
-    name: {
+    dynamicContent: {
+
         textAlign: "center",
-        width: "100%"
+        width: "70%"
+    },
+
+    staticContent: {
+        width: "30%"
     },
 
     typeImageContainer: {
@@ -168,6 +181,7 @@ const styles = StyleSheet.create({
 
     },
     holoImageContainer: {
+        width: "70%",
         flex: 1,
         flexDirection: "row",
         justifyContent: "center",
