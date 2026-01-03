@@ -119,7 +119,6 @@ export async function fetchBaseSetCards() {
 }
 
 function addPokemonTypeLogos(card: Card) {
-  console.log("add type")
   const typeLogos: ImageSourcePropType[] = [];
   if (card.types?.includes("Normal") || card.types?.includes("Colorless") || card.name.includes("Colorless Energy")) {
     typeLogos.push(require("@/assets/images/normal-type.png"))
