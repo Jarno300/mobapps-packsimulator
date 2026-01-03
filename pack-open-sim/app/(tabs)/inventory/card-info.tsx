@@ -9,8 +9,6 @@ export default function CardInfoScreen() {
     const { cardId } = useLocalSearchParams<{ cardId: string }>();
     const cardList = getCardCache();
     const card = cardList.find((c) => String(c.id) === cardId);
-    console.log(card)
-    console.log(card?.typeLogos)
     if (!card || !card.typeLogos || !card.rarity || card.holo === undefined) {
         return (
             <View style={styles.container}>
@@ -28,7 +26,7 @@ export default function CardInfoScreen() {
                 <View>
                     <View style={styles.dynamicContentContainer}>
                         <ThemedText style={[styles.text, styles.staticContent]}>NAME:</ThemedText>
-                        <ThemedText style={[styles.text, styles.dynamicContent]}>{card.name.toUpperCase()}</ThemedText>
+                        {nameLengthChecker(card.name)}
                     </View>
                     <View style={styles.typeContainer}>
                         <ThemedText style={[styles.text, styles.staticContent]}>TYPES: </ThemedText>
@@ -53,7 +51,14 @@ export default function CardInfoScreen() {
 }
 
 function typeImageGenerator(typeImageList: ImageSourcePropType[]) {
-    if (!typeImageList) { return null };
+
+
+    if (typeImageList.length === 0) {
+        return (
+            <ThemedText style={[styles.text, styles.dynamicContent]}>NONE</ThemedText>
+        )
+
+    };
 
     return typeImageList.map((imageSource, index) => (
 
@@ -72,17 +77,25 @@ function holoCheckImageGenerator(holo: Boolean) {
     if (holo) {
         return (
             <Image
-                source={require("@/assets/images/checkmark.png")}
+                source={require("../../../assets/images/checkmark.png")}
                 style={styles.holoImage}
             />
         )
     }
     return (
         <Image
-            source={require("@/assets/images/cross.png")}
+            source={require("../../../assets/images/cross.png")}
             style={styles.holoImage}
         />
     )
+}
+
+function nameLengthChecker(name: string) {
+    if (name.length >= 14) {
+        return (
+            <ThemedText style={[styles.smallText, styles.dynamicContent]}>{name.toUpperCase()}</ThemedText>
+        )
+    }
 }
 
 const styles = StyleSheet.create({
@@ -120,11 +133,16 @@ const styles = StyleSheet.create({
         fontWeight: "500",
         alignSelf: "center"
     },
+    smallText: {
+        fontSize: 11,
+        fontWeight: "500",
+        alignSelf: "center"
+    },
 
     typeContainer: {
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "flex-start",
+        justifyContent: "center",
         width: 200,
         marginBottom: 5,
 
