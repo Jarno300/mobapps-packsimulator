@@ -11,7 +11,7 @@ export default function CardInfoScreen() {
     const card = cardList.find((c) => String(c.id) === cardId);
     console.log(card)
     console.log(card?.typeLogos)
-    if (card && card.typeLogos && card.rarity && card.holo) {
+    if (card && card.typeLogos && card.rarity && card.holo !== undefined) {
         return (
             <ScrollView>
 
