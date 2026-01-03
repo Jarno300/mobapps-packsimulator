@@ -5,9 +5,10 @@ import {
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
+import { View } from "react-native";
 import "react-native-reanimated";
 
 import { ThemeProvider } from "@/contexts/theme-context";
@@ -50,25 +51,37 @@ function RootLayoutNav() {
 }
 
 export default function RootLayout() {
+  const [appIsReady, setAppIsReady] = useState(false);
   const [fontsLoaded] = useFonts({
     "Pokemon-RBYGSC": require("@/assets/fonts/PKMN RBYGSC.ttf"),
   });
 
   useEffect(() => {
     if (fontsLoaded) {
-      SplashScreen.hideAsync();
+      const timeout = setTimeout(() => {
+        setAppIsReady(true);
+      }, 100);
+      return () => clearTimeout(timeout);
     }
   }, [fontsLoaded]);
 
-  if (!fontsLoaded) {
+  const onLayoutRootView = useCallback(async () => {
+    if (appIsReady) {
+      await SplashScreen.hideAsync();
+    }
+  }, [appIsReady]);
+
+  if (!appIsReady) {
     return null;
   }
 
   return (
-    <ThemeProvider>
-      <PlayerProvider>
-        <RootLayoutNav />
-      </PlayerProvider>
-    </ThemeProvider>
+    <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+      <ThemeProvider>
+        <PlayerProvider>
+          <RootLayoutNav />
+        </PlayerProvider>
+      </ThemeProvider>
+    </View>
   );
 }

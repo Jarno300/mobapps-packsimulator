@@ -6,6 +6,8 @@ import { usePlayer } from "@/contexts/player-context";
 import Achievement from "@/components/pokémon-related-components/achievement";
 import { ACHIEVEMENTS } from "@/constants/achievements";
 import { THEME_COLORS } from "@/constants/colors";
+import { FONTS } from "@/constants/fonts";
+import { PokeBorder } from "@/components/ui/poke-border";
 
 export default function AchievementsScreen() {
   const { isDark } = useTheme();
@@ -34,26 +36,20 @@ export default function AchievementsScreen() {
             </Text>
           </View>
 
-          <View
-            style={[
-              styles.filterCard,
-              {
-                backgroundColor: colors.card,
-                borderColor: colors.border,
-              },
-            ]}
-          >
-            <Text style={[styles.filterLabel, { color: colors.textPrimary }]}>
-              Hide claimed
-            </Text>
-            <Switch
-              value={hideClaimed}
-              onValueChange={setHideClaimed}
-              trackColor={{ false: "#D1D5DB", true: "#10B981" }}
-              thumbColor="#FFFFFF"
-              ios_backgroundColor="#D1D5DB"
-            />
-          </View>
+          <PokeBorder style={styles.filterWrapper} borderColor={colors.border}>
+            <View style={[styles.filterCard, { backgroundColor: colors.card }]}>
+              <Text style={[styles.filterLabel, { color: colors.textPrimary }]}>
+                Hide claimed
+              </Text>
+              <Switch
+                value={hideClaimed}
+                onValueChange={setHideClaimed}
+                trackColor={{ false: "#D1D5DB", true: "#10B981" }}
+                thumbColor="#FFFFFF"
+                ios_backgroundColor="#D1D5DB"
+              />
+            </View>
+          </PokeBorder>
 
           {ACHIEVEMENTS.map((achievement) => (
             <Achievement
@@ -86,21 +82,20 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   title: {
-    fontSize: 32,
-    fontWeight: "700",
-    letterSpacing: -0.5,
+    fontSize: 24,
+    fontFamily: FONTS.pokemon,
+  },
+  filterWrapper: {
+    marginBottom: 16,
   },
   filterCard: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     padding: 16,
-    borderRadius: 16,
-    borderWidth: 1,
-    marginBottom: 16,
   },
   filterLabel: {
-    fontSize: 16,
-    fontWeight: "500",
+    fontSize: 14,
+    fontFamily: FONTS.pokemon,
   },
 });

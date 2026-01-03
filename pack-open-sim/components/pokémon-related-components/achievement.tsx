@@ -2,6 +2,8 @@ import { StyleSheet, View, Text, Pressable } from "react-native";
 import { Player, usePlayer } from "@/contexts/player-context";
 import { useTheme } from "@/contexts/theme-context";
 import { THEME_COLORS } from "@/constants/colors";
+import { FONTS } from "@/constants/fonts";
+import { PokeBorder } from "@/components/ui/poke-border";
 
 type AchievementProps = {
   title: string;
@@ -63,55 +65,49 @@ export default function Achievement({
   const buttonStyle = getButtonStyle();
 
   return (
-    <View
-      style={[
-        styles.card,
-        {
-          backgroundColor: colors.card,
-          borderColor: colors.border,
-        },
-      ]}
-    >
-      <View style={styles.header}>
-        <View style={styles.titleSection}>
-          <Text style={[styles.title, { color: colors.textPrimary }]}>
-            {title}
-          </Text>
-          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-            {subtitle}
-          </Text>
+    <PokeBorder style={styles.cardWrapper} borderColor={colors.border}>
+      <View style={[styles.card, { backgroundColor: colors.card }]}>
+        <View style={styles.header}>
+          <View style={styles.titleSection}>
+            <Text style={[styles.title, { color: colors.textPrimary }]}>
+              {title}
+            </Text>
+            <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+              {subtitle}
+            </Text>
+          </View>
+          <View
+            style={[styles.statusDot, { backgroundColor: getStatusColor() }]}
+          />
         </View>
-        <View
-          style={[styles.statusDot, { backgroundColor: getStatusColor() }]}
-        />
-      </View>
 
-      <Pressable
-        style={[
-          styles.button,
-          {
-            backgroundColor: buttonStyle.backgroundColor,
-            borderColor: buttonStyle.borderColor,
-          },
-          !canClaim && !isClaimed && styles.buttonDisabled,
-        ]}
-        onPress={onClaim}
-        disabled={!canClaim}
-      >
-        <Text style={[styles.buttonText, { color: getButtonTextColor() }]}>
-          {isClaimed ? "Claimed" : canClaim ? "Claim Reward" : "Locked"}
-        </Text>
-      </Pressable>
-    </View>
+        <Pressable
+          style={[
+            styles.button,
+            {
+              backgroundColor: buttonStyle.backgroundColor,
+              borderColor: buttonStyle.borderColor,
+            },
+            !canClaim && !isClaimed && styles.buttonDisabled,
+          ]}
+          onPress={onClaim}
+          disabled={!canClaim}
+        >
+          <Text style={[styles.buttonText, { color: getButtonTextColor() }]}>
+            {isClaimed ? "Claimed" : canClaim ? "Claim Reward" : "Locked"}
+          </Text>
+        </Pressable>
+      </View>
+    </PokeBorder>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    borderRadius: 16,
-    borderWidth: 1,
-    padding: 20,
+  cardWrapper: {
     marginBottom: 12,
+  },
+  card: {
+    padding: 20,
   },
   header: {
     flexDirection: "row",
@@ -124,14 +120,14 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   title: {
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 14,
+    fontFamily: FONTS.pokemon,
     marginBottom: 6,
   },
   subtitle: {
-    fontSize: 14,
-    fontWeight: "400",
-    lineHeight: 20,
+    fontSize: 11,
+    fontFamily: FONTS.pokemon,
+    lineHeight: 18,
   },
   statusDot: {
     width: 10,
@@ -150,7 +146,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   buttonText: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: 12,
+    fontFamily: FONTS.pokemon,
   },
 });
