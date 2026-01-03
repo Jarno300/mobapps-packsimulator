@@ -134,7 +134,7 @@ function addPokemonTypeLogos(card: Card) {
 
 
   }
-  if (card.types?.includes("Electric") || card.name.includes("Electric Energy")) {
+  if (card.types?.includes("Electric") || card.types?.includes("Lightning") || card.name.includes("Electric Energy")) {
     typeLogos.push(require("@/assets/images/electric-type.png"))
 
 
@@ -171,7 +171,7 @@ function typeAssigner(card: Card) {
       card.types?.push("Water");
     }
     if (card.name.includes("Electric Energy")) {
-      card.types?.push("Electric");
+      card.types?.push("Lightning");
     }
     if (card.name.includes("Fire Energy")) {
       card.types?.push("Fire");
