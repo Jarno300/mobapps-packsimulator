@@ -12,7 +12,8 @@ export default function CardInfoScreen() {
     const { cardId } = useLocalSearchParams<{ cardId: string }>();
     const cardList = getCardCache();
     const card = cardList.find((c) => String(c.id) === cardId);
-    if (!card || !card.typeLogos || !card.rarity || card.holo === undefined || !card.price) {
+
+    if (!card || !card.typeLogos || !card.rarity || card.holo === undefined || card.price === undefined) {
         return (
             <View style={styles.container}>
                 <ThemedText>Card not found</ThemedText>
@@ -49,7 +50,7 @@ export default function CardInfoScreen() {
                     <View style={styles.priceContainer}>
                         <ThemedText style={[styles.text, styles.staticContent]}>PRICE:</ThemedText>
                         <View style={[styles.priceValueContainer, styles.dynamicContent]}>
-                            <ThemedText style={[styles.text,]}>{card.price.toString().toUpperCase()}</ThemedText>
+                            <ThemedText style={[styles.text,]}>{card.price.toString()}</ThemedText>
                             <Image
                                 source={require("../../../assets/images/pokecoin.png")}
                                 style={styles.styleCoin}
