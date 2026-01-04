@@ -8,7 +8,10 @@ import { useTheme } from "@/contexts/theme-context";
 
 import { ThemedText } from "@/components/themed-text";
 import { getCardCache } from "@/cache/setCardCache";
-import { ColorProperties } from "react-native-reanimated/lib/typescript/Colors";
+import { useSellCard } from "@/hooks/use-sell-card";
+import { usePlayer } from "@/contexts/player-context";
+
+
 
 
 
@@ -17,10 +20,12 @@ import { ColorProperties } from "react-native-reanimated/lib/typescript/Colors";
 export default function CardInfoScreen() {
     const colors = CheckColor();
 
-
+    const { sellCard } = useSellCard();
     const { cardId } = useLocalSearchParams<{ cardId: string }>();
     const cardList = getCardCache();
     const card = cardList.find((c) => String(c.id) === cardId);
+    const player = usePlayer().player;
+
 
     if (!card || !card.typeLogos || !card.rarity || card.holo === undefined || card.price === undefined) {
         return (
@@ -70,7 +75,8 @@ export default function CardInfoScreen() {
                         </View>
 
                         <TouchableOpacity style={styles.sellButton}
-                            onPress={() => console.log("Kaart actie voor:", card.name)}
+                            onPress={() => sellCard(card)}
+                            disabled={player.ownedCards[card.id] <= 0}
                         >
                             <ThemedText style={styles.text}>SELL</ThemedText>
                         </TouchableOpacity>

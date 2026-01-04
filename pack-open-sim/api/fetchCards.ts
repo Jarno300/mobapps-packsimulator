@@ -10,7 +10,7 @@ export interface Card {
   rarity?: string;
   image?: string;
   holo?: boolean;
-  price?: Number;
+  price?: number;
   typeLogos?: ImageSourcePropType[];
 
 }
