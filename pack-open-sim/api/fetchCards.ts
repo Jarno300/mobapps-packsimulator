@@ -133,7 +133,7 @@ function addPokemonTypeLogos(card: Card) {
 
 
   }
-  if (card.types?.includes("Electric") || card.types?.includes("Lightning") || card.name.includes("Electric Energy")) {
+  if (card.types?.includes("Electric") || card.types?.includes("Lightning") || card.name.includes("Lightning Energy")) {
     typeLogos.push(require("@/assets/images/electric-type.png"))
 
 

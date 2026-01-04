@@ -1,9 +1,12 @@
 import { ScrollView, StyleSheet, View, Image } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import type { ImageSourcePropType } from "react-native";
+import { FONTS } from "@/constants/fonts";
 
 import { ThemedText } from "@/components/themed-text";
 import { getCardCache } from "@/cache/setCardCache";
+
+
 
 export default function CardInfoScreen() {
     const { cardId } = useLocalSearchParams<{ cardId: string }>();
@@ -23,7 +26,7 @@ export default function CardInfoScreen() {
                 <View style={styles.cardContainer}>
                     <Image source={{ uri: card?.image }} style={styles.image} />
                 </View>
-                <View>
+                <View style={{ width: '100%' }}>
                     <View style={styles.dynamicContentContainer}>
                         <ThemedText style={[styles.text, styles.staticContent]}>NAME:</ThemedText>
                         {nameLengthChecker(card.name)}
@@ -92,9 +95,6 @@ function holoCheckImageGenerator(holo: Boolean) {
 
 function nameLengthChecker(name: string) {
     if (name.length >= 17) {
-        if (name.length >= 20) {
-            return (<ThemedText style={[styles.verySmallText, styles.dynamicContent]}>{name.toUpperCase()}</ThemedText>)
-        }
         return (
             <ThemedText style={[styles.smallText, styles.dynamicContent]}>{name.toUpperCase()}</ThemedText>
         )
@@ -109,6 +109,10 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         paddingTop: 20,
+        fontFamily: FONTS.pokemon,
+        paddingLeft: 10,
+        paddingRight: 10,
+
     },
 
     cardContainer: {
@@ -135,26 +139,24 @@ const styles = StyleSheet.create({
     text: {
         fontSize: 15,
         fontWeight: "500",
-        alignSelf: "center"
+        alignSelf: "center",
+        fontFamily: FONTS.pokemon
     },
     smallText: {
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: "500",
-        alignSelf: "center"
+        alignSelf: "center",
+        fontFamily: FONTS.pokemon
     },
 
-    verySmallText: {
-        fontSize: 10,
-        fontWeight: "500",
-        alignSelf: "center"
-    },
+
 
     typeContainer: {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
-        width: 200,
         marginBottom: 5,
+
 
 
 
@@ -162,7 +164,6 @@ const styles = StyleSheet.create({
 
     dynamicContentContainer: {
         flexDirection: "row",
-        width: 200,
         textAlign: "left",
         marginBottom: 5,
 
@@ -201,7 +202,6 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "flex-start",
-        width: 200,
         marginBottom: 5,
         height: 30
 
