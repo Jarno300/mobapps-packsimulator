@@ -37,6 +37,7 @@ export async function fetchCardDetails(cardId: string): Promise<Card | null> {
       return null;
     }
     const card = await response.json();
+    console.log(card)
 
     const types = typeAssigner(card)
 
@@ -169,7 +170,7 @@ function typeAssigner(card: Card) {
     if (card.name.includes("Water Energy")) {
       card.types?.push("Water");
     }
-    if (card.name.includes("Electric Energy")) {
+    if (card.name.includes("Lightning Energy")) {
       card.types?.push("Lightning");
     }
     if (card.name.includes("Fire Energy")) {
