@@ -76,7 +76,7 @@ export default function CardInfoScreen() {
 
                         <TouchableOpacity style={styles.sellButton}
                             onPress={() => sellCard(card)}
-                            disabled={player.ownedCards[card.id] <= 0}
+                            disabled={(player.ownedCards[card.id] ?? 0) <= 0}
                         >
                             <ThemedText style={styles.text}>SELL</ThemedText>
                         </TouchableOpacity>
