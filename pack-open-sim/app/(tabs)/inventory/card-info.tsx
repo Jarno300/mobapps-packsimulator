@@ -18,7 +18,8 @@ import { usePlayer } from "@/contexts/player-context";
 
 
 export default function CardInfoScreen() {
-    const colors = CheckColor();
+    const { isDark } = useTheme();
+    const colors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
 
     const { sellCard } = useSellCard();
     const { cardId } = useLocalSearchParams<{ cardId: string }>();
@@ -136,12 +137,6 @@ function nameLengthChecker(name: string) {
         )
     }
     return (<ThemedText style={[styles.text, styles.dynamicContent]}>{name.toUpperCase()}</ThemedText>)
-}
-
-function CheckColor() {
-    const { isDark } = useTheme();
-    const colors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
-    return colors;
 }
 
 const styles = StyleSheet.create({

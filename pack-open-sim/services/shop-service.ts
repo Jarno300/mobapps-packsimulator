@@ -1,8 +1,8 @@
 import type { ImageSourcePropType } from "react-native";
-import { Player, usePlayer } from "@/contexts/player-context";
+import { Player, } from "@/contexts/player-context";
 import { createBoosterPack } from "@/components/pokémon-related-components/booster-pack";
 import { PACK_PRICE } from "@/constants/packs";
-import { Card } from "@/api/fetchCards";
+
 
 
 export interface BuyPackResult {
