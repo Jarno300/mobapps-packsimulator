@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, View, Image } from "react-native";
+import { ScrollView, StyleSheet, View, Image, TouchableOpacity } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import type { ImageSourcePropType } from "react-native";
 import { FONTS } from "@/constants/fonts";
@@ -12,7 +12,7 @@ export default function CardInfoScreen() {
     const { cardId } = useLocalSearchParams<{ cardId: string }>();
     const cardList = getCardCache();
     const card = cardList.find((c) => String(c.id) === cardId);
-    if (!card || !card.typeLogos || !card.rarity || card.holo === undefined) {
+    if (!card || !card.typeLogos || !card.rarity || card.holo === undefined || !card.price) {
         return (
             <View style={styles.container}>
                 <ThemedText>Card not found</ThemedText>
@@ -46,6 +46,22 @@ export default function CardInfoScreen() {
                             {holoCheckImageGenerator(card.holo)}
                         </View>
                     </View>
+                    <View style={styles.priceContainer}>
+                        <ThemedText style={[styles.text, styles.staticContent]}>PRICE:</ThemedText>
+                        <View style={[styles.priceValueContainer, styles.dynamicContent]}>
+                            <ThemedText style={[styles.text,]}>{card.price.toString().toUpperCase()}</ThemedText>
+                            <Image
+                                source={require("../../../assets/images/pokecoin.png")}
+                                style={styles.styleCoin}
+                            />
+                        </View>
+                    </View>
+                    <TouchableOpacity
+                        style={styles.sellButton}
+                        onPress={() => console.log("Kaart actie voor:", card.name)}
+                    >
+                        <ThemedText style={styles.text}>SELL</ThemedText>
+                    </TouchableOpacity>
                 </View>
 
             </View>
@@ -112,6 +128,7 @@ const styles = StyleSheet.create({
         fontFamily: FONTS.pokemon,
         paddingLeft: 10,
         paddingRight: 10,
+
 
     },
 
@@ -203,7 +220,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "flex-start",
         marginBottom: 5,
-        height: 30
 
 
 
@@ -222,6 +238,36 @@ const styles = StyleSheet.create({
         height: 30,
         resizeMode: "contain",
 
+    },
+
+    styleCoin: {
+        width: 20,
+        height: 20,
+        resizeMode: "contain",
+        alignSelf: "center"
+    },
+    priceContainer: {
+        flexDirection: "row",
+        alignContent: "center",
+        justifyContent: "center",
+
+
+    },
+
+    priceValueContainer: {
+        flexDirection: "row",
+        alignContent: "center",
+        justifyContent: "center",
+        gap: 4
+
+    },
+    sellButton: {
+        marginTop: 5,
+        alignSelf: "center",
+        padding: 5,
+        borderRadius: 10,
+        backgroundColor: "green",
+        width: "40%"
     }
 
 
