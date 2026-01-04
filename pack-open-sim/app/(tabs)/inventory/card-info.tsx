@@ -2,13 +2,22 @@ import { ScrollView, StyleSheet, View, Image, TouchableOpacity } from "react-nat
 import { useLocalSearchParams } from "expo-router";
 import type { ImageSourcePropType } from "react-native";
 import { FONTS } from "@/constants/fonts";
+import { PokeBorder } from "@/components/ui/poke-border";
+import { THEME_COLORS } from "@/constants/colors";
+import { useTheme } from "@/contexts/theme-context";
 
 import { ThemedText } from "@/components/themed-text";
 import { getCardCache } from "@/cache/setCardCache";
+import { ColorProperties } from "react-native-reanimated/lib/typescript/Colors";
+
+
 
 
 
 export default function CardInfoScreen() {
+    const colors = CheckColor();
+
+
     const { cardId } = useLocalSearchParams<{ cardId: string }>();
     const cardList = getCardCache();
     const card = cardList.find((c) => String(c.id) === cardId);
@@ -26,44 +35,47 @@ export default function CardInfoScreen() {
             <View style={styles.container}>
                 <View style={styles.cardContainer}>
                     <Image source={{ uri: card?.image }} style={styles.image} />
-                </View>
-                <View style={{ width: '100%' }}>
-                    <View style={styles.dynamicContentContainer}>
-                        <ThemedText style={[styles.text, styles.staticContent]}>NAME:</ThemedText>
-                        {nameLengthChecker(card.name)}
-                    </View>
-                    <View style={styles.typeContainer}>
-                        <ThemedText style={[styles.text, styles.staticContent]}>TYPES: </ThemedText>
-                        <View style={styles.typeImageContainer}>{typeImageGenerator(card?.typeLogos)}</View>
-                    </View>
-                    <View style={styles.dynamicContentContainer}>
-                        <ThemedText style={[styles.text, styles.staticContent]}>RARITY:</ThemedText>
-                        <ThemedText style={[styles.text, styles.dynamicContent]}>{card.rarity.toUpperCase()}</ThemedText>
-                    </View>
 
-                    <View style={styles.holoContainer}>
-                        <ThemedText style={[styles.text, styles.staticContent]}>HOLO:</ThemedText>
-                        <View style={styles.holoImageContainer}>
-                            {holoCheckImageGenerator(card.holo)}
-                        </View>
-                    </View>
-                    <View style={styles.priceContainer}>
-                        <ThemedText style={[styles.text, styles.staticContent]}>PRICE:</ThemedText>
-                        <View style={[styles.priceValueContainer, styles.dynamicContent]}>
-                            <ThemedText style={[styles.text,]}>{card.price.toString()}</ThemedText>
-                            <Image
-                                source={require("../../../assets/images/pokecoin.png")}
-                                style={styles.styleCoin}
-                            />
-                        </View>
-                    </View>
-                    <TouchableOpacity
-                        style={styles.sellButton}
-                        onPress={() => console.log("Kaart actie voor:", card.name)}
-                    >
-                        <ThemedText style={styles.text}>SELL</ThemedText>
-                    </TouchableOpacity>
                 </View>
+                <PokeBorder style={{ width: '100%', marginTop: 5, borderColor: colors.border }}>
+                    <View style={{ width: '100%', padding: 5 }}>
+                        <View style={styles.dynamicContentContainer}>
+                            <ThemedText style={[styles.text, styles.staticContent, { color: colors.textSecondary }]}>NAME:</ThemedText>
+                            {nameLengthChecker(card.name)}
+                        </View>
+                        <View style={styles.typeContainer}>
+                            <ThemedText style={[styles.text, styles.staticContent]}>TYPES: </ThemedText>
+                            <View style={styles.typeImageContainer}>{typeImageGenerator(card?.typeLogos)}</View>
+                        </View>
+                        <View style={styles.dynamicContentContainer}>
+                            <ThemedText style={[styles.text, styles.staticContent]}>RARITY:</ThemedText>
+                            <ThemedText style={[styles.text, styles.dynamicContent]}>{card.rarity.toUpperCase()}</ThemedText>
+                        </View>
+
+                        <View style={styles.holoContainer}>
+                            <ThemedText style={[styles.text, styles.staticContent]}>HOLO:</ThemedText>
+                            <View style={styles.holoImageContainer}>
+                                {holoCheckImageGenerator(card.holo)}
+                            </View>
+                        </View>
+                        <View style={styles.priceContainer}>
+                            <ThemedText style={[styles.text, styles.staticContent]}>PRICE:</ThemedText>
+                            <View style={[styles.priceValueContainer, styles.dynamicContent]}>
+                                <ThemedText style={[styles.text,]}>{card.price.toString()}</ThemedText>
+                                <Image
+                                    source={require("../../../assets/images/pokecoin.png")}
+                                    style={styles.styleCoin}
+                                />
+                            </View>
+                        </View>
+                        <TouchableOpacity
+                            style={styles.sellButton}
+                            onPress={() => console.log("Kaart actie voor:", card.name)}
+                        >
+                            <ThemedText style={styles.text}>SELL</ThemedText>
+                        </TouchableOpacity>
+                    </View>
+                </PokeBorder>
 
             </View>
         </ScrollView>
@@ -119,6 +131,12 @@ function nameLengthChecker(name: string) {
     return (<ThemedText style={[styles.text, styles.dynamicContent]}>{name.toUpperCase()}</ThemedText>)
 }
 
+function CheckColor() {
+    const { isDark } = useTheme();
+    const colors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
+    return colors;
+}
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -158,7 +176,9 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: "500",
         alignSelf: "center",
-        fontFamily: FONTS.pokemon
+        fontFamily: FONTS.pokemon,
+
+
     },
     smallText: {
         fontSize: 11,
