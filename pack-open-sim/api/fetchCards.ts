@@ -50,7 +50,7 @@ export async function fetchCardDetails(cardId: string): Promise<Card | null> {
       energyType: card.energyType,
       image: card.image ? `${card.image}/high.webp` : undefined,
       holo: card.variants?.holo ?? false,
-      price: Number(Math.floor(card.pricing.cardmarket.avg)),
+      price: Number(Math.ceil(card.pricing.cardmarket.avg)),
       typeLogos: addPokemonTypeLogos(card)
 
     };

@@ -68,12 +68,13 @@ export default function CardInfoScreen() {
                                 />
                             </View>
                         </View>
-                        <TouchableOpacity
-                            style={styles.sellButton}
+
+                        <TouchableOpacity style={styles.sellButton}
                             onPress={() => console.log("Kaart actie voor:", card.name)}
                         >
                             <ThemedText style={styles.text}>SELL</ThemedText>
                         </TouchableOpacity>
+
                     </View>
                 </PokeBorder>
 
@@ -284,11 +285,14 @@ const styles = StyleSheet.create({
     },
     sellButton: {
         marginTop: 5,
-        alignSelf: "center",
         padding: 5,
         borderRadius: 10,
-        backgroundColor: "green",
-        width: "40%"
+        borderColor: "black",
+        borderStyle: "solid",
+        borderWidth: 2,
+        width: "30%",
+        alignSelf: "center"
+
     }
 
 
