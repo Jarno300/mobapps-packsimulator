@@ -6,7 +6,7 @@ export const PACK_IMAGES: Record<string, ReturnType<typeof require>> = {
   "Booster-Pack-Bulbasaur": require("@/assets/images/Booster-Pack-Bulbasaur.png"),
 };
 
-export const PACK_PRICE = 500;
+export const PACK_PRICE = 10;
 
 export interface PackConfig {
   id: string;

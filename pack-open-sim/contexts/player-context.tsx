@@ -28,7 +28,7 @@ export interface Player {
 const defaultPlayer: Player = {
   achievements: [],
   username: "DefaultPlayerName",
-  money: 10000,
+  money: 2000,
   openedPacks: 0,
   luck: 0,
   obtainedRaritiesTotal: {
