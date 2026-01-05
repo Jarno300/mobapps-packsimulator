@@ -301,7 +301,12 @@ function PackGrid({
   const colors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
 
   if (packs.length === 0) {
-    return <EmptyState message="No packs in inventory" />;
+    return (
+      <EmptyState
+        message="No packs in inventory. 
+      Grab a pack from the shop!"
+      />
+    );
   }
 
   return (
@@ -490,8 +495,9 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 4,
     right: 4,
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#EF4444",
     borderRadius: 10,
+    borderWidth: 2,
     paddingHorizontal: 6,
     paddingVertical: 2,
     minWidth: 24,

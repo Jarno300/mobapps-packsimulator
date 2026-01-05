@@ -1,5 +1,7 @@
-import { View, StyleSheet, TouchableOpacity } from "react-native";
-import { ThemedText } from "@/components/themed-text";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { useTheme } from "@/contexts/theme-context";
+import { THEME_COLORS } from "@/constants/colors";
+import { FONTS } from "@/constants/fonts";
 
 interface EmptyStateProps {
   message: string;
@@ -12,12 +14,22 @@ export function EmptyState({
   onAction,
   actionLabel,
 }: EmptyStateProps) {
+  const { isDark } = useTheme();
+  const colors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
+
   return (
     <View style={styles.container}>
-      <ThemedText style={styles.message}>{message}</ThemedText>
+      <Text style={[styles.message, { color: colors.textSecondary }]}>
+        {message}
+      </Text>
       {onAction && actionLabel && (
-        <TouchableOpacity style={styles.actionButton} onPress={onAction}>
-          <ThemedText>{actionLabel}</ThemedText>
+        <TouchableOpacity
+          style={[styles.actionButton, { backgroundColor: colors.card }]}
+          onPress={onAction}
+        >
+          <Text style={[styles.actionLabel, { color: colors.textPrimary }]}>
+            {actionLabel}
+          </Text>
         </TouchableOpacity>
       )}
     </View>
@@ -32,14 +44,18 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
   },
   message: {
+    fontFamily: FONTS.pokemon,
+    fontSize: 12,
     textAlign: "center",
-    opacity: 0.6,
     marginBottom: 10,
   },
   actionButton: {
     marginTop: 20,
     padding: 12,
-    backgroundColor: "rgba(10, 126, 164, 0.2)",
     borderRadius: 8,
+  },
+  actionLabel: {
+    fontFamily: FONTS.pokemon,
+    fontSize: 12,
   },
 });
