@@ -10,6 +10,7 @@ import { auth } from "@/config/firebase";
 import { Platform } from "react-native";
 import * as Google from "expo-auth-session/providers/google";
 import * as WebBrowser from "expo-web-browser";
+import * as AuthSession from "expo-auth-session";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -27,9 +28,17 @@ export async function signInWithGoogleWeb() {
 }
 
 export function useGoogleAuth() {
+  const redirectUri = AuthSession.makeRedirectUri({
+    scheme: "packopensim",
+    path: "redirect",
+  });
+
   const [request, response, promptAsync] = Google.useAuthRequest({
     clientId: WEB_CLIENT_ID,
+    redirectUri,
   });
+
+  console.log("redirectUri", redirectUri);
 
   return { request, response, promptAsync };
 }
