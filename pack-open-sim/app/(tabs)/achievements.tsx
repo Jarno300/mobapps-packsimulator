@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ScrollView, StyleSheet, View, Text, Switch } from "react-native";
+import { ScrollView, StyleSheet, View, Text, Pressable } from "react-native";
 
 import { useTheme } from "@/contexts/theme-context";
 import { usePlayer } from "@/contexts/player-context";
@@ -37,23 +37,34 @@ export default function AchievementsScreen() {
             <Text style={[styles.title, { color: colors.textPrimary }]}>
               Achievements
             </Text>
-            <MoneyDisplay amount={player.money} size="medium" />
+            <MoneyDisplay amount={player.money} size="small" />
           </View>
 
-          <PokeBorder style={styles.filterWrapper} borderColor={colors.border}>
-            <View style={[styles.filterCard, { backgroundColor: colors.card }]}>
-              <Text style={[styles.filterLabel, { color: colors.textPrimary }]}>
-                Hide claimed
-              </Text>
-              <Switch
-                value={hideClaimed}
-                onValueChange={setHideClaimed}
-                trackColor={{ false: "#D1D5DB", true: "#10B981" }}
-                thumbColor="#FFFFFF"
-                ios_backgroundColor="#D1D5DB"
-              />
-            </View>
-          </PokeBorder>
+          <Pressable onPress={() => setHideClaimed(!hideClaimed)}>
+            <PokeBorder
+              style={styles.filterWrapper}
+              borderColor={colors.border}
+            >
+              <View
+                style={[styles.filterCard, { backgroundColor: colors.card }]}
+              >
+                <Text
+                  style={[styles.filterLabel, { color: colors.textPrimary }]}
+                >
+                  Hide claimed
+                </Text>
+                <View
+                  style={[
+                    styles.checkbox,
+                    { borderColor: colors.textSecondary },
+                    hideClaimed && styles.checkboxChecked,
+                  ]}
+                >
+                  {hideClaimed && <Text style={styles.checkmark}>✓</Text>}
+                </View>
+              </View>
+            </PokeBorder>
+          </Pressable>
 
           {ACHIEVEMENTS.map((achievement) => (
             <Achievement
@@ -105,5 +116,22 @@ const styles = StyleSheet.create({
   filterLabel: {
     fontSize: 14,
     fontFamily: FONTS.pokemon,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderWidth: 2,
+    borderRadius: 4,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  checkboxChecked: {
+    backgroundColor: "#10B981",
+    borderColor: "#10B981",
+  },
+  checkmark: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

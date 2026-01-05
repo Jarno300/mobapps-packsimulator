@@ -17,6 +17,7 @@ import {
 export interface Player {
   achievements: string[];
   username: string;
+  isLoggedIn: boolean;
   money: number;
   openedPacks: number;
   luck: number;
@@ -33,7 +34,8 @@ export interface Player {
 
 const defaultPlayer: Player = {
   achievements: [],
-  username: "DefaultPlayerName",
+  username: "",
+  isLoggedIn: false,
   money: 2000,
   openedPacks: 0,
   luck: 0,
@@ -67,7 +69,7 @@ const STORAGE_KEY = "@player";
 // Check if player has meaningful progress
 function hasProgress(player: Player): boolean {
   return (
-    player.username !== "DefaultPlayerName" ||
+    player.isLoggedIn ||
     player.openedPacks > 0 ||
     player.packInventory.length > 0 ||
     Object.keys(player.ownedCards).length > 0 ||
@@ -118,20 +120,19 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
           // Only local has data - upload it to cloud
           const playerWithUsername = {
             ...localPlayer!,
-            username:
-              localPlayer!.username !== "DefaultPlayerName"
-                ? localPlayer!.username
-                : user.displayName || "Trainer",
+            username: localPlayer!.username || user.displayName || "Trainer",
+            isLoggedIn: true,
           };
           setPlayer(playerWithUsername);
           await savePlayerToFirestore(user.uid, playerWithUsername);
           // Clear local storage after uploading
           await AsyncStorage.removeItem(STORAGE_KEY);
         } else {
-          // Neither has data - create new
+          // Neither has data - create new with onboarding complete (Google login = already authenticated)
           const newPlayer = {
             ...defaultPlayer,
             username: user.displayName || "Trainer",
+            isLoggedIn: true,
           };
           setPlayer(newPlayer);
           await savePlayerToFirestore(user.uid, newPlayer);

@@ -22,9 +22,11 @@ export default function HomeScreen() {
   const { player, updatePlayer } = usePlayer();
   const { isDark } = useTheme();
 
-  if (player.username === "DefaultPlayerName") {
+  if (!player.isLoggedIn) {
     return (
-      <NameInputScreen onSubmit={(name) => updatePlayer({ username: name })} />
+      <NameInputScreen
+        onSubmit={(name) => updatePlayer({ username: name, isLoggedIn: true })}
+      />
     );
   }
 

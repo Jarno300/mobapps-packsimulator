@@ -6,19 +6,25 @@ import {
   ScrollView,
   Pressable,
 } from "react-native";
+import { useRouter } from "expo-router";
 
 import { useTheme } from "@/contexts/theme-context";
 import { useAuth } from "@/contexts/auth-context";
+import { usePlayer } from "@/contexts/player-context";
 import { SettingCard } from "@/components/ui/setting-card";
 import { SectionHeader } from "@/components/ui/section-header";
 import { AppHeader } from "@/components/ui/app-header";
 import { THEME_COLORS } from "@/constants/colors";
 import { FONTS } from "@/constants/fonts";
 import { signInWithGoogleWeb, isWeb } from "@/services/firebase-auth";
+import { useAudio } from "@/contexts/audio-context";
 
 export default function SettingsScreen() {
+  const router = useRouter();
   const { setTheme, isDark } = useTheme();
   const { user, signOut } = useAuth();
+  const { updatePlayer } = usePlayer();
+  const { stopMainTheme } = useAudio();
   const colors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
 
   const toggleTheme = (value: boolean) => {
@@ -32,7 +38,10 @@ export default function SettingsScreen() {
   };
 
   const handleLogout = async () => {
+    stopMainTheme();
     await signOut();
+    updatePlayer({ isLoggedIn: false });
+    router.replace("/");
   };
 
   return (
@@ -73,15 +82,27 @@ export default function SettingsScreen() {
               </Pressable>
             </SettingCard>
           ) : (
-            <SettingCard
-              title="Playing as Guest"
-              subtitle="Sign in to sync your progress"
-              isDark={isDark}
-            >
-              <Pressable style={styles.loginButton} onPress={handleGoogleLogin}>
-                <Text style={styles.loginButtonText}>Sign in with Google</Text>
-              </Pressable>
-            </SettingCard>
+            <>
+              <SettingCard
+                title="Playing as Guest"
+                subtitle="Sign in to sync your progress"
+                isDark={isDark}
+              >
+                <Pressable
+                  style={styles.loginButton}
+                  onPress={handleGoogleLogin}
+                >
+                  <Text style={styles.loginButtonText}>
+                    Sign in with Google
+                  </Text>
+                </Pressable>
+              </SettingCard>
+              <SettingCard title="Log out" isDark={isDark}>
+                <Pressable style={styles.logoutButton} onPress={handleLogout}>
+                  <Text style={styles.logoutButtonText}>Logout</Text>
+                </Pressable>
+              </SettingCard>
+            </>
           )}
 
           <SectionHeader title="ABOUT" isDark={isDark} />

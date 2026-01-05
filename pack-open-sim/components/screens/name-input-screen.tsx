@@ -15,6 +15,8 @@ import {
   signInWithGoogleWeb,
   isWeb,
 } from "@/services/firebase-auth";
+import { useTitleScreenMusic, useBattleMusic } from "@/services/audio-service";
+import { useAudio } from "@/contexts/audio-context";
 
 interface NameInputScreenProps {
   onSubmit: (name: string) => void;
@@ -25,11 +27,39 @@ export function NameInputScreen({ onSubmit }: NameInputScreenProps) {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [musicStarted, setMusicStarted] = useState(false);
 
-  // Only use expo-auth-session for native
+  const titleMusic = useTitleScreenMusic();
+  const battleMusic = useBattleMusic();
+  const { playMainTheme } = useAudio();
+
+  const startMusic = () => {
+    if (!musicStarted) {
+      titleMusic.play();
+      setMusicStarted(true);
+    }
+  };
+
+  // Try to autoplay (works on native, may fail on web)
+  useEffect(() => {
+    if (!isWeb) {
+      startMusic();
+    }
+    return () => {
+      titleMusic.pause();
+    };
+  }, [titleMusic.player]);
+
+  // Handle transition - stop title music, play battle music
+  useEffect(() => {
+    if (isTransitioning) {
+      titleMusic.pause();
+      battleMusic.play();
+    }
+  }, [isTransitioning]);
+
   const { request, response, promptAsync } = useGoogleAuth();
 
-  // Handle native Google sign-in response
   useEffect(() => {
     if (!isWeb && response?.type === "success") {
       const { id_token } = response.params;
@@ -80,14 +110,17 @@ export function NameInputScreen({ onSubmit }: NameInputScreenProps) {
   };
 
   const handleTransitionComplete = () => {
-    onSubmit(name.trim() || "Trainer");
+    battleMusic.fadeOut(1000, () => {
+      playMainTheme();
+      onSubmit(name.trim() || "Trainer");
+    });
   };
 
   const isGuestDisabled = !name.trim() || isTransitioning || isLoading;
   const isGoogleDisabled = isLoading || (!isWeb && !request);
 
   return (
-    <View style={styles.container}>
+    <Pressable style={styles.container} onPress={startMusic}>
       <View style={styles.logoSection}>
         <Image
           source={require("@/assets/images/pokemon-text-logo.png")}
@@ -104,7 +137,6 @@ export function NameInputScreen({ onSubmit }: NameInputScreenProps) {
       <View style={styles.formSection}>
         {error && <Text style={styles.errorText}>{error}</Text>}
 
-        {/* Google Sign In Button */}
         <Pressable
           style={[
             styles.googleButton,
@@ -124,7 +156,6 @@ export function NameInputScreen({ onSubmit }: NameInputScreenProps) {
           <View style={styles.dividerLine} />
         </View>
 
-        {/* Guest Play Option */}
         <TextInput
           style={styles.input}
           value={name}
@@ -154,7 +185,7 @@ export function NameInputScreen({ onSubmit }: NameInputScreenProps) {
         onComplete={handleTransitionComplete}
         color="#000"
       />
-    </View>
+    </Pressable>
   );
 }
 

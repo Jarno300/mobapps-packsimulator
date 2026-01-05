@@ -50,9 +50,9 @@ export default function TabLayout() {
   const { player } = usePlayer();
   const pathname = usePathname();
 
-  const isOnboarding = player.username === "DefaultPlayerName";
+  const isLoggedIn = !player.isLoggedIn;
   const isPackOpening = pathname.includes("pack-opening");
-  const hideChrome = isOnboarding || isPackOpening;
+  const hideChrome = isLoggedIn || isPackOpening;
 
   return (
     <View style={styles.container}>

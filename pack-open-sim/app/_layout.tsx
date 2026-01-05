@@ -14,6 +14,7 @@ import "react-native-reanimated";
 import { ThemeProvider } from "@/contexts/theme-context";
 import { AuthProvider } from "@/contexts/auth-context";
 import { PlayerProvider } from "@/contexts/player-context";
+import { AudioProvider } from "@/contexts/audio-context";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { fetchBaseSetCards } from "@/api/fetchCards";
 import { usePlayer } from "@/contexts/player-context";
@@ -83,7 +84,9 @@ export default function RootLayout() {
       <ThemeProvider>
         <AuthProvider>
           <PlayerProvider>
-            <RootLayoutNav />
+            <AudioProvider>
+              <RootLayoutNav />
+            </AudioProvider>
           </PlayerProvider>
         </AuthProvider>
       </ThemeProvider>
