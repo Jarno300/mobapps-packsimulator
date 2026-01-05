@@ -14,6 +14,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { PackImage } from "@/components/pack/pack-image";
 import { PokeBorder } from "@/components/ui/poke-border";
+import { AppHeader } from "@/components/ui/app-header";
 import { usePlayer } from "@/contexts/player-context";
 import { useTheme } from "@/contexts/theme-context";
 import { THEME_COLORS } from "@/constants/colors";
@@ -355,6 +356,7 @@ export default function InventoryScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <AppHeader />
       <View style={styles.content}>
         <Text style={[styles.title, { color: colors.textPrimary }]}>
           Inventory

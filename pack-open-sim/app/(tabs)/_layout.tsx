@@ -4,6 +4,7 @@ import { View, StyleSheet, Image } from "react-native";
 
 import { HapticTab } from "@/components/haptic-tab";
 import { Colors } from "@/constants/theme";
+import { FONTS } from "@/constants/fonts";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { usePlayer } from "@/contexts/player-context";
 
@@ -55,7 +56,6 @@ export default function TabLayout() {
 
   return (
     <View style={styles.container}>
-      {!hideChrome && <View style={styles.header} />}
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
@@ -63,6 +63,11 @@ export default function TabLayout() {
             Colors[colorScheme ?? "light"].tabIconDefault,
           headerShown: false,
           tabBarButton: HapticTab,
+          tabBarLabelStyle: {
+            fontFamily: FONTS.pokemon,
+            marginTop: 4,
+            fontSize: 6,
+          },
           tabBarStyle: hideChrome
             ? { display: "none" }
             : {
@@ -128,10 +133,6 @@ export default function TabLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    height: 60,
-    backgroundColor: "#ff0000",
   },
   iconContainer: {
     alignItems: "center",

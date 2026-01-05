@@ -3,6 +3,7 @@ import { StyleSheet, View, ScrollView, Text } from "react-native";
 import { MoneyDisplay } from "@/components/ui/money-display";
 import { PackShopItem } from "@/components/ui/pack-shop-item";
 import { PokeBorder } from "@/components/ui/poke-border";
+import { AppHeader } from "@/components/ui/app-header";
 import { usePlayer } from "@/contexts/player-context";
 import { useTheme } from "@/contexts/theme-context";
 import { buyPack, canAffordPack } from "@/services/shop-service";
@@ -28,6 +29,7 @@ export default function ShopScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={true}>
+        <AppHeader />
         <View style={styles.contentPadding}>
           <View style={styles.header}>
             <Text style={[styles.title, { color: colors.textPrimary }]}>

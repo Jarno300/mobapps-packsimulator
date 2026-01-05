@@ -8,6 +8,7 @@ import { RarityBadge } from "@/components/ui/rarity-badge";
 import { CollectionProgress } from "@/components/ui/collection-progress";
 import { MoneyDisplay } from "@/components/ui/money-display";
 import { PokeBorder } from "@/components/ui/poke-border";
+import { AppHeader } from "@/components/ui/app-header";
 import { THEME_COLORS } from "@/constants/colors";
 import { FONTS } from "@/constants/fonts";
 
@@ -32,6 +33,7 @@ export default function HomeScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <AppHeader showPokemonLogo />
         <View style={styles.contentPadding}>
           <View style={styles.welcomeSection}>
             <Text

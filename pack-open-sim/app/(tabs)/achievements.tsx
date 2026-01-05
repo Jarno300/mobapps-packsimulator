@@ -9,6 +9,7 @@ import { THEME_COLORS } from "@/constants/colors";
 import { FONTS } from "@/constants/fonts";
 import { PokeBorder } from "@/components/ui/poke-border";
 import { MoneyDisplay } from "@/components/ui/money-display";
+import { AppHeader } from "@/components/ui/app-header";
 
 export default function AchievementsScreen() {
   const { isDark } = useTheme();
@@ -30,6 +31,7 @@ export default function AchievementsScreen() {
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
       >
+        <AppHeader />
         <View style={styles.content}>
           <View style={styles.header}>
             <Text style={[styles.title, { color: colors.textPrimary }]}>

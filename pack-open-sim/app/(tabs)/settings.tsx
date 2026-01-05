@@ -3,6 +3,7 @@ import { StyleSheet, Switch, View, Text, ScrollView } from "react-native";
 import { useTheme } from "@/contexts/theme-context";
 import { SettingCard } from "@/components/ui/setting-card";
 import { SectionHeader } from "@/components/ui/section-header";
+import { AppHeader } from "@/components/ui/app-header";
 import { THEME_COLORS } from "@/constants/colors";
 import { FONTS } from "@/constants/fonts";
 
@@ -17,6 +18,7 @@ export default function SettingsScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <AppHeader />
         <View style={styles.contentPadding}>
           <View style={styles.header}>
             <Text style={[styles.title, { color: colors.textPrimary }]}>
