@@ -440,6 +440,7 @@ const styles = StyleSheet.create({
   packsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
+    justifyContent: "center",
     gap: 16,
   },
   packItem: {
