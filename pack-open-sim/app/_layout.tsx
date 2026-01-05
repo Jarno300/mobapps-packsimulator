@@ -12,10 +12,12 @@ import { View } from "react-native";
 import "react-native-reanimated";
 
 import { ThemeProvider } from "@/contexts/theme-context";
+import { AuthProvider } from "@/contexts/auth-context";
 import { PlayerProvider } from "@/contexts/player-context";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { fetchBaseSetCards } from "@/api/fetchCards";
 import { usePlayer } from "@/contexts/player-context";
+import { DataConflictModal } from "@/components/ui/data-conflict-modal";
 
 // Prevent splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -46,6 +48,7 @@ function RootLayoutNav() {
         />
       </Stack>
       <StatusBar style="auto" />
+      <DataConflictModal />
     </NavigationThemeProvider>
   );
 }
@@ -78,9 +81,11 @@ export default function RootLayout() {
   return (
     <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <ThemeProvider>
-        <PlayerProvider>
-          <RootLayoutNav />
-        </PlayerProvider>
+        <AuthProvider>
+          <PlayerProvider>
+            <RootLayoutNav />
+          </PlayerProvider>
+        </AuthProvider>
       </ThemeProvider>
     </View>
   );

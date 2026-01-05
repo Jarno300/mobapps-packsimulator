@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,12 @@ import {
 } from "react-native";
 import { SpiralTransition } from "@/components/animations/spiral-transition";
 import { FONTS } from "@/constants/fonts";
+import {
+  useGoogleAuth,
+  signInWithGoogleNative,
+  signInWithGoogleWeb,
+  isWeb,
+} from "@/services/firebase-auth";
 
 interface NameInputScreenProps {
   onSubmit: (name: string) => void;
@@ -17,18 +23,68 @@ interface NameInputScreenProps {
 export function NameInputScreen({ onSubmit }: NameInputScreenProps) {
   const [name, setName] = useState("");
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = () => {
+  // Only use expo-auth-session for native
+  const { request, response, promptAsync } = useGoogleAuth();
+
+  // Handle native Google sign-in response
+  useEffect(() => {
+    if (!isWeb && response?.type === "success") {
+      const { id_token } = response.params;
+      handleNativeGoogleSignIn(id_token);
+    }
+  }, [response]);
+
+  const handleNativeGoogleSignIn = async (idToken: string) => {
+    setIsLoading(true);
+    setError(null);
+
+    const { user, error: authError } = await signInWithGoogleNative(idToken);
+
+    if (authError) {
+      setError(authError);
+      setIsLoading(false);
+    } else if (user) {
+      setIsTransitioning(true);
+    }
+  };
+
+  const handleWebGoogleSignIn = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    const { user, error: authError } = await signInWithGoogleWeb();
+
+    if (authError) {
+      setError(authError);
+      setIsLoading(false);
+    } else if (user) {
+      setIsTransitioning(true);
+    }
+  };
+
+  const handleGooglePress = () => {
+    if (isWeb) {
+      handleWebGoogleSignIn();
+    } else {
+      promptAsync();
+    }
+  };
+
+  const handleGuestPlay = () => {
     if (name.trim() && !isTransitioning) {
       setIsTransitioning(true);
     }
   };
 
   const handleTransitionComplete = () => {
-    onSubmit(name.trim());
+    onSubmit(name.trim() || "Trainer");
   };
 
-  const isDisabled = !name.trim() || isTransitioning;
+  const isGuestDisabled = !name.trim() || isTransitioning || isLoading;
+  const isGoogleDisabled = isLoading || (!isWeb && !request);
 
   return (
     <View style={styles.container}>
@@ -46,24 +102,44 @@ export function NameInputScreen({ onSubmit }: NameInputScreenProps) {
       </View>
 
       <View style={styles.formSection}>
-        <Text style={styles.label}>Your name:</Text>
+        {error && <Text style={styles.errorText}>{error}</Text>}
+
+        {/* Google Sign In Button */}
+        <Pressable
+          style={[
+            styles.googleButton,
+            isGoogleDisabled && styles.buttonDisabled,
+          ]}
+          onPress={handleGooglePress}
+          disabled={isGoogleDisabled}
+        >
+          <Text style={styles.googleButtonText}>
+            {isLoading ? "Loading..." : "Continue with Google"}
+          </Text>
+        </Pressable>
+
+        <View style={styles.divider}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>OR</Text>
+          <View style={styles.dividerLine} />
+        </View>
+
+        {/* Guest Play Option */}
         <TextInput
           style={styles.input}
           value={name}
           onChangeText={setName}
           placeholder="Enter your name"
           placeholderTextColor="rgba(255,255,255,0.5)"
-          autoFocus
-          editable={!isTransitioning}
+          editable={!isTransitioning && !isLoading}
         />
+
         <Pressable
-          style={[styles.button, isDisabled && styles.buttonDisabled]}
-          onPress={handleSubmit}
-          disabled={isDisabled}
+          style={[styles.guestButton, isGuestDisabled && styles.buttonDisabled]}
+          onPress={handleGuestPlay}
+          disabled={isGuestDisabled}
         >
-          <Text style={styles.buttonText}>
-            {isTransitioning ? "..." : "Start"}
-          </Text>
+          <Text style={styles.guestButtonText}>Play as Guest</Text>
         </Pressable>
       </View>
 
@@ -96,27 +172,28 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   pokeballIcon: {
-    width: 100,
-    height: 100,
+    width: 80,
+    height: 80,
   },
   pokemonLogo: {
-    width: 280,
-    height: 100,
+    width: 250,
+    height: 90,
     marginBottom: 8,
   },
   simulatorTitle: {
-    width: 200,
-    height: 24,
+    width: 180,
+    height: 22,
   },
   formSection: {
     width: "100%",
     alignItems: "center",
   },
-  label: {
-    fontSize: 24,
+  errorText: {
+    color: "#FFEB3B",
+    fontSize: 12,
     fontFamily: FONTS.pokemon,
-    color: "#fff",
-    marginBottom: 24,
+    marginBottom: 12,
+    textAlign: "center",
   },
   input: {
     width: "100%",
@@ -124,26 +201,60 @@ const styles = StyleSheet.create({
     borderRadius: 0,
     borderWidth: 3,
     borderColor: "#fff",
-    padding: 18,
-    fontSize: 16,
+    padding: 16,
+    fontSize: 14,
     fontFamily: FONTS.pokemon,
     color: "#fff",
-    marginBottom: 24,
-  },
-  button: {
-    backgroundColor: "#fff",
-    paddingVertical: 16,
-    paddingHorizontal: 56,
-    borderRadius: 0,
-    borderWidth: 3,
-    borderColor: "#000",
+    marginBottom: 16,
   },
   buttonDisabled: {
     opacity: 0.5,
   },
-  buttonText: {
-    color: "#EF4444",
-    fontSize: 16,
+  googleButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 0,
+    borderWidth: 3,
+    borderColor: "#000",
+    width: "100%",
+    justifyContent: "center",
+  },
+  googleButtonText: {
+    color: "#333",
+    fontSize: 12,
     fontFamily: FONTS.pokemon,
+  },
+  guestButton: {
+    backgroundColor: "transparent",
+    paddingVertical: 14,
+    paddingHorizontal: 40,
+    borderRadius: 0,
+    borderWidth: 3,
+    borderColor: "#fff",
+  },
+  guestButtonText: {
+    color: "#fff",
+    fontSize: 14,
+    fontFamily: FONTS.pokemon,
+  },
+  divider: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+    marginVertical: 20,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "rgba(255,255,255,0.3)",
+  },
+  dividerText: {
+    color: "#fff",
+    fontSize: 10,
+    fontFamily: FONTS.pokemon,
+    marginHorizontal: 12,
   },
 });

@@ -1,18 +1,38 @@
-import { StyleSheet, Switch, View, Text, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  Switch,
+  View,
+  Text,
+  ScrollView,
+  Pressable,
+} from "react-native";
 
 import { useTheme } from "@/contexts/theme-context";
+import { useAuth } from "@/contexts/auth-context";
 import { SettingCard } from "@/components/ui/setting-card";
 import { SectionHeader } from "@/components/ui/section-header";
 import { AppHeader } from "@/components/ui/app-header";
 import { THEME_COLORS } from "@/constants/colors";
 import { FONTS } from "@/constants/fonts";
+import { signInWithGoogleWeb, isWeb } from "@/services/firebase-auth";
 
 export default function SettingsScreen() {
   const { setTheme, isDark } = useTheme();
+  const { user, signOut } = useAuth();
   const colors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
 
   const toggleTheme = (value: boolean) => {
     setTheme(value ? "dark" : "light");
+  };
+
+  const handleGoogleLogin = async () => {
+    if (isWeb) {
+      await signInWithGoogleWeb();
+    }
+  };
+
+  const handleLogout = async () => {
+    await signOut();
   };
 
   return (
@@ -40,6 +60,29 @@ export default function SettingsScreen() {
               ios_backgroundColor="#D1D5DB"
             />
           </SettingCard>
+
+          <SectionHeader title="ACCOUNT" isDark={isDark} />
+          {user ? (
+            <SettingCard
+              title="Logged in with Google"
+              subtitle={user.email || ""}
+              isDark={isDark}
+            >
+              <Pressable style={styles.logoutButton} onPress={handleLogout}>
+                <Text style={styles.logoutButtonText}>Logout</Text>
+              </Pressable>
+            </SettingCard>
+          ) : (
+            <SettingCard
+              title="Playing as Guest"
+              subtitle="Sign in to sync your progress"
+              isDark={isDark}
+            >
+              <Pressable style={styles.loginButton} onPress={handleGoogleLogin}>
+                <Text style={styles.loginButtonText}>Sign in with Google</Text>
+              </Pressable>
+            </SettingCard>
+          )}
 
           <SectionHeader title="ABOUT" isDark={isDark} />
           <SettingCard title="Version" isDark={isDark}>
@@ -78,6 +121,28 @@ const styles = StyleSheet.create({
   },
   valueText: {
     fontSize: 12,
+    fontFamily: FONTS.pokemon,
+  },
+  logoutButton: {
+    backgroundColor: "#EF4444",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+  },
+  logoutButtonText: {
+    color: "#fff",
+    fontSize: 10,
+    fontFamily: FONTS.pokemon,
+  },
+  loginButton: {
+    backgroundColor: "#4285F4",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+  },
+  loginButtonText: {
+    color: "#fff",
+    fontSize: 10,
     fontFamily: FONTS.pokemon,
   },
 });
