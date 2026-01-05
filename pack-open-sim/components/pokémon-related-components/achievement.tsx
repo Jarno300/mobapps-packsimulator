@@ -4,10 +4,12 @@ import { useTheme } from "@/contexts/theme-context";
 import { THEME_COLORS } from "@/constants/colors";
 import { FONTS } from "@/constants/fonts";
 import { PokeBorder } from "@/components/ui/poke-border";
+import { MoneyDisplay } from "@/components/ui/money-display";
 
 type AchievementProps = {
   title: string;
   subtitle: string;
+  reward?: number;
   condition: (player: Player) => boolean;
   onClaim: () => void;
   hideClaimed?: boolean;
@@ -16,6 +18,7 @@ type AchievementProps = {
 export default function Achievement({
   title,
   subtitle,
+  reward,
   condition,
   onClaim,
   hideClaimed,
@@ -72,9 +75,28 @@ export default function Achievement({
             <Text style={[styles.title, { color: colors.textPrimary }]}>
               {title}
             </Text>
-            <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-              {subtitle}
-            </Text>
+            <View style={styles.subtitleRow}>
+              <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+                {subtitle}
+              </Text>
+              {reward !== undefined && (
+                <View style={styles.rewardContainer}>
+                  <Text
+                    style={[
+                      styles.rewardLabel,
+                      { color: colors.textSecondary },
+                    ]}
+                  >
+                    Reward:
+                  </Text>
+                  <MoneyDisplay
+                    amount={reward}
+                    size="medium"
+                    showBackground={true}
+                  />
+                </View>
+              )}
+            </View>
           </View>
           <View
             style={[styles.statusDot, { backgroundColor: getStatusColor() }]}
@@ -124,10 +146,23 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.pokemon,
     marginBottom: 6,
   },
+  subtitleRow: {
+    gap: 8,
+  },
   subtitle: {
     fontSize: 11,
     fontFamily: FONTS.pokemon,
     lineHeight: 18,
+  },
+  rewardContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 4,
+  },
+  rewardLabel: {
+    fontSize: 11,
+    fontFamily: FONTS.pokemon,
   },
   statusDot: {
     width: 10,

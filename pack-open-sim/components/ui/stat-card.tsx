@@ -1,16 +1,19 @@
 import { View, Text, StyleSheet } from "react-native";
+import type { ReactNode } from "react";
 import { THEME_COLORS } from "@/constants/colors";
 import { FONTS } from "@/constants/fonts";
-import { PokeBorder } from "./poke-border";
+import { PokeBorder } from "@/components/ui/poke-border";
 
 interface StatCardProps {
   label: string;
-  value: string | number;
+  value: string | number | ReactNode;
   isDark: boolean;
 }
 
 export function StatCard({ label, value, isDark }: StatCardProps) {
   const colors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
+
+  const isTextValue = typeof value === "string" || typeof value === "number";
 
   return (
     <PokeBorder style={styles.container} borderColor={colors.border}>
@@ -18,9 +21,13 @@ export function StatCard({ label, value, isDark }: StatCardProps) {
         <Text style={[styles.label, { color: colors.textSecondary }]}>
           {label}
         </Text>
-        <Text style={[styles.value, { color: colors.textPrimary }]}>
-          {value}
-        </Text>
+        {isTextValue ? (
+          <Text style={[styles.value, { color: colors.textPrimary }]}>
+            {value}
+          </Text>
+        ) : (
+          value
+        )}
       </View>
     </PokeBorder>
   );

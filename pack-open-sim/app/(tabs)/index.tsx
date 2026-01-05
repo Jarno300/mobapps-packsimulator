@@ -6,6 +6,7 @@ import { NameInputScreen } from "@/components/screens/name-input-screen";
 import { StatCard } from "@/components/ui/stat-card";
 import { RarityBadge } from "@/components/ui/rarity-badge";
 import { CollectionProgress } from "@/components/ui/collection-progress";
+import { MoneyDisplay } from "@/components/ui/money-display";
 import { PokeBorder } from "@/components/ui/poke-border";
 import { THEME_COLORS } from "@/constants/colors";
 import { FONTS } from "@/constants/fonts";
@@ -43,7 +44,13 @@ export default function HomeScreen() {
           <View style={styles.statsGrid}>
             <StatCard
               label="Wallet"
-              value={`$${player.money.toLocaleString()}`}
+              value={
+                <MoneyDisplay
+                  amount={player.money}
+                  size="large"
+                  showBackground={false}
+                />
+              }
               isDark={isDark}
             />
             <StatCard

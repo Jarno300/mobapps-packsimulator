@@ -5,16 +5,19 @@ import {
   View,
   Image,
   Pressable,
+  Text,
 } from "react-native";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "expo-router";
 
-import { ThemedText } from "@/components/themed-text";
-import { ThemedView } from "@/components/themed-view";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { PackImage } from "@/components/pack/pack-image";
+import { PokeBorder } from "@/components/ui/poke-border";
 import { usePlayer } from "@/contexts/player-context";
+import { useTheme } from "@/contexts/theme-context";
+import { THEME_COLORS } from "@/constants/colors";
+import { FONTS } from "@/constants/fonts";
 import {
   Card,
   getFetchStatus,
@@ -76,22 +79,37 @@ function TabButton({
   label,
   isActive,
   onPress,
+  isDark,
 }: {
   label: string;
   isActive: boolean;
   onPress: () => void;
+  isDark: boolean;
 }) {
+  const colors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
+
   return (
     <TouchableOpacity
-      style={[styles.tab, isActive && styles.tabActive]}
+      style={[
+        styles.tab,
+        {
+          backgroundColor: isActive ? colors.card : "transparent",
+          borderColor: colors.border,
+          borderWidth: isActive ? 2 : 1,
+        },
+      ]}
       onPress={onPress}
     >
-      <ThemedText
-        type="defaultSemiBold"
-        style={[styles.tabText, isActive && styles.tabTextActive]}
+      <Text
+        style={[
+          styles.tabText,
+          {
+            color: isActive ? colors.textPrimary : colors.textMuted,
+          },
+        ]}
       >
         {label}
-      </ThemedText>
+      </Text>
     </TouchableOpacity>
   );
 }
@@ -99,9 +117,11 @@ function TabButton({
 function InventoryTabs({
   selectedTab,
   onTabChange,
+  isDark,
 }: {
   selectedTab: TabType;
   onTabChange: (tab: TabType) => void;
+  isDark: boolean;
 }) {
   return (
     <View style={styles.tabs}>
@@ -109,19 +129,30 @@ function InventoryTabs({
         label="Packs"
         isActive={selectedTab === "packs"}
         onPress={() => onTabChange("packs")}
+        isDark={isDark}
       />
       <TabButton
         label="Cards"
         isActive={selectedTab === "cards"}
         onPress={() => onTabChange("cards")}
+        isDark={isDark}
       />
     </View>
   );
 }
 
-function CardItem({ card, ownedCount }: { card: Card; ownedCount: number }) {
+function CardItem({
+  card,
+  ownedCount,
+  isDark,
+}: {
+  card: Card;
+  ownedCount: number;
+  isDark: boolean;
+}) {
   const isOwned = ownedCount > 0;
   const router = useRouter();
+  const colors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
 
   return (
     <TouchableOpacity
@@ -147,16 +178,23 @@ function CardItem({ card, ownedCount }: { card: Card; ownedCount: number }) {
           />
         ) : (
           <View
-            style={[styles.cardPlaceholder, !isOwned && styles.cardUnowned]}
+            style={[
+              styles.cardPlaceholder,
+              { borderColor: colors.border },
+              !isOwned && styles.cardUnowned,
+            ]}
           >
-            <ThemedText style={styles.cardNameText} numberOfLines={2}>
+            <Text
+              style={[styles.cardNameText, { color: colors.textPrimary }]}
+              numberOfLines={2}
+            >
               {card.name || "Unknown Card"}
-            </ThemedText>
+            </Text>
           </View>
         )}
         {isOwned && (
           <View style={styles.ownedBadge}>
-            <ThemedText style={styles.ownedBadgeText}>x{ownedCount}</ThemedText>
+            <Text style={styles.ownedBadgeText}>x{ownedCount}</Text>
           </View>
         )}
       </View>
@@ -170,13 +208,17 @@ function CardGrid({
   isLoading,
   error,
   onRetry,
+  isDark,
 }: {
   cards: Card[];
   ownedCards: Record<string, number>;
   isLoading: boolean;
   error: string | null;
   onRetry: () => void;
+  isDark: boolean;
 }) {
+  const colors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
+
   if (isLoading) {
     return <EmptyState message="Loading cards..." />;
   }
@@ -204,21 +246,30 @@ function CardGrid({
   const ownedCount = Object.keys(ownedCards).length;
 
   return (
-    <ScrollView style={styles.content}>
-      <View style={styles.cardsHeader}>
-        <ThemedText style={styles.cardCount}>
-          {ownedCount} / {cards.length} cards collected
-        </ThemedText>
-      </View>
-      <View style={styles.cardsGrid}>
-        {cards.map((card) => (
-          <CardItem
-            key={card.id}
-            card={card}
-            ownedCount={ownedCards[card.id] || 0}
-          />
-        ))}
-      </View>
+    <ScrollView
+      style={styles.scrollContent}
+      showsVerticalScrollIndicator={false}
+    >
+      <PokeBorder borderColor={colors.border}>
+        <View style={[styles.gridContainer, { backgroundColor: colors.card }]}>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+            Collection
+          </Text>
+          <Text style={[styles.cardCount, { color: colors.textSecondary }]}>
+            {ownedCount} / {cards.length} cards collected
+          </Text>
+          <View style={styles.cardsGrid}>
+            {cards.map((card) => (
+              <CardItem
+                key={card.id}
+                card={card}
+                ownedCount={ownedCards[card.id] || 0}
+                isDark={isDark}
+              />
+            ))}
+          </View>
+        </View>
+      </PokeBorder>
     </ScrollView>
   );
 }
@@ -233,9 +284,6 @@ function PackItem({
   return (
     <Pressable style={styles.packItem} onPress={onPress}>
       <PackImage packName={pack.name} size="small" />
-      <ThemedText type="defaultSemiBold" style={styles.packStatus}>
-        {pack.isOpened ? "Opened" : "Sealed"}
-      </ThemedText>
     </Pressable>
   );
 }
@@ -243,25 +291,39 @@ function PackItem({
 function PackGrid({
   packs,
   onPackPress,
+  isDark,
 }: {
   packs: BoosterPack[];
   onPackPress: (packId: number) => void;
+  isDark: boolean;
 }) {
+  const colors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
+
   if (packs.length === 0) {
     return <EmptyState message="No packs in inventory" />;
   }
 
   return (
-    <ScrollView style={styles.content}>
-      <View style={styles.packsGrid}>
-        {packs.map((pack) => (
-          <PackItem
-            key={pack.id}
-            pack={pack}
-            onPress={() => onPackPress(pack.id)}
-          />
-        ))}
-      </View>
+    <ScrollView
+      style={styles.scrollContent}
+      showsVerticalScrollIndicator={false}
+    >
+      <PokeBorder borderColor={colors.border}>
+        <View style={[styles.gridContainer, { backgroundColor: colors.card }]}>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+            Booster Packs
+          </Text>
+          <View style={styles.packsGrid}>
+            {packs.map((pack) => (
+              <PackItem
+                key={pack.id}
+                pack={pack}
+                onPress={() => onPackPress(pack.id)}
+              />
+            ))}
+          </View>
+        </View>
+      </PokeBorder>
     </ScrollView>
   );
 }
@@ -269,8 +331,11 @@ function PackGrid({
 export default function InventoryScreen() {
   const router = useRouter();
   const { player } = usePlayer();
+  const { isDark } = useTheme();
   const [selectedTab, setSelectedTab] = useState<TabType>("packs");
   const { cards, isLoading, error, retry, refreshCache } = useCardCache();
+
+  const colors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
 
   useEffect(() => {
     if (selectedTab === "cards") {
@@ -289,36 +354,53 @@ export default function InventoryScreen() {
   );
 
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="title" style={styles.title}>
-        Inventory
-      </ThemedText>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={styles.content}>
+        <Text style={[styles.title, { color: colors.textPrimary }]}>
+          Inventory
+        </Text>
 
-      <InventoryTabs selectedTab={selectedTab} onTabChange={setSelectedTab} />
-
-      {selectedTab === "packs" && (
-        <PackGrid packs={player.packInventory} onPackPress={handlePackPress} />
-      )}
-
-      {selectedTab === "cards" && (
-        <CardGrid
-          cards={cards}
-          ownedCards={player.ownedCards}
-          isLoading={isLoading}
-          error={error}
-          onRetry={retry}
+        <InventoryTabs
+          selectedTab={selectedTab}
+          onTabChange={setSelectedTab}
+          isDark={isDark}
         />
-      )}
-    </ThemedView>
+
+        {selectedTab === "packs" && (
+          <PackGrid
+            packs={player.packInventory}
+            onPackPress={handlePackPress}
+            isDark={isDark}
+          />
+        )}
+
+        {selectedTab === "cards" && (
+          <CardGrid
+            cards={cards}
+            ownedCards={player.ownedCards}
+            isLoading={isLoading}
+            error={error}
+            onRetry={retry}
+            isDark={isDark}
+          />
+        )}
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  content: {
+    flex: 1,
     padding: 20,
+    paddingBottom: 0,
   },
   title: {
+    fontSize: 24,
+    fontFamily: FONTS.pokemon,
     marginBottom: 20,
   },
   tabs: {
@@ -331,21 +413,22 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
-    backgroundColor: "rgba(0, 0, 0, 0.05)",
     alignItems: "center",
   },
-  tabActive: {
-    backgroundColor: "rgba(10, 126, 164, 0.2)",
-  },
   tabText: {
-    fontSize: 16,
-    opacity: 0.6,
+    fontSize: 14,
+    fontFamily: FONTS.pokemon,
   },
-  tabTextActive: {
-    opacity: 1,
-  },
-  content: {
+  scrollContent: {
     flex: 1,
+  },
+  gridContainer: {
+    padding: 16,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontFamily: FONTS.pokemon,
+    marginBottom: 8,
   },
   packsGrid: {
     flexDirection: "row",
@@ -353,18 +436,13 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   packItem: {
-    width: 120,
+    width: 100,
     alignItems: "center",
   },
-  packStatus: {
-    fontSize: 16,
-  },
-  cardsHeader: {
-    marginBottom: 12,
-  },
   cardCount: {
-    fontSize: 14,
-    opacity: 0.7,
+    fontSize: 11,
+    fontFamily: FONTS.pokemon,
+    marginBottom: 12,
   },
   cardsGrid: {
     flexDirection: "row",
@@ -404,7 +482,7 @@ const styles = StyleSheet.create({
   cardNameText: {
     textAlign: "center",
     fontSize: 10,
-    fontWeight: "bold",
+    fontFamily: FONTS.pokemon,
   },
   ownedBadge: {
     position: "absolute",
@@ -420,6 +498,6 @@ const styles = StyleSheet.create({
   ownedBadgeText: {
     color: "#fff",
     fontSize: 10,
-    fontWeight: "bold",
+    fontFamily: FONTS.pokemon,
   },
 });

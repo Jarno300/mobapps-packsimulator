@@ -8,6 +8,7 @@ import { ACHIEVEMENTS } from "@/constants/achievements";
 import { THEME_COLORS } from "@/constants/colors";
 import { FONTS } from "@/constants/fonts";
 import { PokeBorder } from "@/components/ui/poke-border";
+import { MoneyDisplay } from "@/components/ui/money-display";
 
 export default function AchievementsScreen() {
   const { isDark } = useTheme();
@@ -34,6 +35,7 @@ export default function AchievementsScreen() {
             <Text style={[styles.title, { color: colors.textPrimary }]}>
               Achievements
             </Text>
+            <MoneyDisplay amount={player.money} size="medium" />
           </View>
 
           <PokeBorder style={styles.filterWrapper} borderColor={colors.border}>
@@ -57,6 +59,7 @@ export default function AchievementsScreen() {
               hideClaimed={hideClaimed}
               title={achievement.title}
               subtitle={achievement.subtitle}
+              reward={achievement.reward}
               condition={achievement.condition}
               onClaim={() => handleClaim(achievement.title, achievement.reward)}
             />
@@ -80,6 +83,9 @@ const styles = StyleSheet.create({
   },
   header: {
     marginBottom: 24,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   title: {
     fontSize: 24,
