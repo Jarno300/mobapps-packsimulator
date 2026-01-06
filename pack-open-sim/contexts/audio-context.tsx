@@ -6,16 +6,19 @@ interface AudioContextValue {
   playMainTheme: () => void;
   stopMainTheme: () => void;
   fadeOutMainTheme: (duration?: number, onComplete?: () => void) => void;
+  setVolumeForMainTheme: (volume: number) => void;
+  mainThemeVolume: number;
 }
 
 const AudioContext = createContext<AudioContextValue | undefined>(undefined);
 
 export function AudioProvider({ children }: { children: ReactNode }) {
   const mainThemePlayer = useAudioPlayer(AUDIO_TRACKS.mainTheme);
+  let mainThemeVolume = 0.3;
 
   const playMainTheme = () => {
     mainThemePlayer.loop = true;
-    mainThemePlayer.volume = 0.3;
+    mainThemePlayer.volume = mainThemeVolume;
     mainThemePlayer.play();
   };
 
@@ -27,9 +30,20 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     fadeOutAudio(mainThemePlayer, duration, onComplete);
   };
 
+  const setVolumeForMainTheme = (volume: number) => {
+    mainThemeVolume = volume;
+    mainThemePlayer.volume = volume;
+  };
+
   return (
     <AudioContext.Provider
-      value={{ playMainTheme, stopMainTheme, fadeOutMainTheme }}
+      value={{
+        playMainTheme,
+        stopMainTheme,
+        fadeOutMainTheme,
+        setVolumeForMainTheme,
+        mainThemeVolume,
+      }}
     >
       {children}
     </AudioContext.Provider>
@@ -42,9 +56,4 @@ export function useAudio() {
     throw new Error("useAudio must be used within an AudioProvider");
   }
   return context;
-}
-
-export function setVolumeForMainTheme(volume: number) {
-  const mainThemePlayer = useAudioPlayer(AUDIO_TRACKS.mainTheme);
-  mainThemePlayer.volume = volume;
 }

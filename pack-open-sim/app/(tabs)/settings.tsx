@@ -7,6 +7,7 @@ import {
   Pressable,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { useState } from "react";
 
 import { useTheme } from "@/contexts/theme-context";
 import { useAuth } from "@/contexts/auth-context";
@@ -18,14 +19,16 @@ import { THEME_COLORS } from "@/constants/colors";
 import { FONTS } from "@/constants/fonts";
 import { signInWithGoogleWeb, isWeb } from "@/services/firebase-auth";
 import { useAudio } from "@/contexts/audio-context";
+import Slider from "@react-native-community/slider";
 
 export default function SettingsScreen() {
   const router = useRouter();
   const { setTheme, isDark } = useTheme();
   const { user, signOut } = useAuth();
   const { updatePlayer } = usePlayer();
-  const { stopMainTheme } = useAudio();
+  const { setVolumeForMainTheme, stopMainTheme } = useAudio();
   const colors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
+  const [mainThemeVolume, setMainThemeVolume] = useState(0.5);
 
   const toggleTheme = (value: boolean) => {
     setTheme(value ? "dark" : "light");
@@ -42,6 +45,11 @@ export default function SettingsScreen() {
     await signOut();
     updatePlayer({ isLoggedIn: false });
     router.replace("/");
+  };
+
+  const handleVolumeChange = (value: number) => {
+    setMainThemeVolume(value);
+    setVolumeForMainTheme(value);
   };
 
   return (
@@ -70,6 +78,26 @@ export default function SettingsScreen() {
             />
           </SettingCard>
 
+          <SectionHeader title="AUDIO" isDark={isDark} />
+          <SettingCard
+            title="Main Theme Volume"
+            subtitle={`${Math.round(mainThemeVolume * 100)}%`}
+            isDark={isDark}
+          >
+            <View style={styles.volumeContainer}>
+              <Slider
+                style={styles.slider}
+                minimumValue={0}
+                maximumValue={1}
+                value={mainThemeVolume}
+                onValueChange={handleVolumeChange}
+                minimumTrackTintColor="#10B981"
+                maximumTrackTintColor="#D1D5DB"
+                thumbTintColor="#10B981"
+              />
+            </View>
+          </SettingCard>
+
           <SectionHeader title="ACCOUNT" isDark={isDark} />
           {user ? (
             <SettingCard
@@ -82,27 +110,15 @@ export default function SettingsScreen() {
               </Pressable>
             </SettingCard>
           ) : (
-            <>
-              <SettingCard
-                title="Playing as Guest"
-                subtitle="Sign in to sync your progress"
-                isDark={isDark}
-              >
-                <Pressable
-                  style={styles.loginButton}
-                  onPress={handleGoogleLogin}
-                >
-                  <Text style={styles.loginButtonText}>
-                    Sign in with Google
-                  </Text>
-                </Pressable>
-              </SettingCard>
-              <SettingCard title="Log out" isDark={isDark}>
-                <Pressable style={styles.logoutButton} onPress={handleLogout}>
-                  <Text style={styles.logoutButtonText}>Logout</Text>
-                </Pressable>
-              </SettingCard>
-            </>
+            <SettingCard
+              title="Playing as Guest"
+              subtitle="Sign in to sync your progress"
+              isDark={isDark}
+            >
+              <Pressable style={styles.loginButton} onPress={handleGoogleLogin}>
+                <Text style={styles.loginButtonText}>Sign in with Google</Text>
+              </Pressable>
+            </SettingCard>
           )}
 
           <SectionHeader title="ABOUT" isDark={isDark} />
@@ -165,5 +181,14 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 10,
     fontFamily: FONTS.pokemon,
+  },
+  volumeContainer: {
+    flex: 1,
+    flexDirection: "row",
+    width: "100%",
+  },
+  slider: {
+    width: "100%",
+    height: 40,
   },
 });
