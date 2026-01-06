@@ -43,3 +43,8 @@ export function useAudio() {
   }
   return context;
 }
+
+export function setVolumeForMainTheme(volume: number) {
+  const mainThemePlayer = useAudioPlayer(AUDIO_TRACKS.mainTheme);
+  mainThemePlayer.volume = volume;
+}
