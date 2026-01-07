@@ -17,7 +17,6 @@ import { PlayerProvider } from "@/contexts/player-context";
 import { AudioProvider } from "@/contexts/audio-context";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { fetchBaseSetCards } from "@/api/fetchCards";
-import { usePlayer } from "@/contexts/player-context";
 import { DataConflictModal } from "@/components/ui/data-conflict-modal";
 
 // Prevent splash screen from auto-hiding
