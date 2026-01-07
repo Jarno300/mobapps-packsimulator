@@ -31,7 +31,7 @@ function RootLayoutNav() {
 
   useEffect(() => {
     fetchBaseSetCards().catch((error) => {
-      console.error("Failed to fetch base set cards:", error);
+      console.error("Error fetching base set cards:", error);
     });
   }, []);
 
