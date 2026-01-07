@@ -16,7 +16,7 @@ interface RarityBadgeProps {
 }
 
 export function RarityBadge({ label, count, icon, isDark }: RarityBadgeProps) {
-  const colors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
+  const colors = THEME_COLORS.light;
 
   return (
     <View
