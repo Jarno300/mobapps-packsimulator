@@ -30,7 +30,7 @@ export default function SettingsScreen() {
   const router = useRouter();
   const { setTheme, isDark } = useTheme();
   const { user, signOut } = useAuth();
-  const { updatePlayer } = usePlayer();
+  const { updatePlayer, resetLocalPlayerData } = usePlayer();
   const { setVolumeForMainTheme, stopMainTheme } = useAudio();
   const colors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
   const [mainThemeVolume, setMainThemeVolume] = useState(0.5);
@@ -56,6 +56,11 @@ export default function SettingsScreen() {
     } else {
       await promptAsync();
     }
+  };
+
+  const handleProgressReset = async () => {
+    await resetLocalPlayerData();
+    router.replace("/");
   };
 
   const handleLogout = async () => {
@@ -142,6 +147,21 @@ export default function SettingsScreen() {
               </Pressable>
             </SettingCard>
           )}
+
+          <SettingCard title="Back to Login Screen" isDark={isDark}>
+            <Pressable style={styles.logoutButton} onPress={handleLogout}>
+              <Text style={styles.logoutButtonText}>Logout</Text>
+            </Pressable>
+          </SettingCard>
+
+          <SettingCard title="Reset Progress" isDark={isDark}>
+            <Pressable
+              style={styles.logoutButton}
+              onPress={handleProgressReset}
+            >
+              <Text style={styles.logoutButtonText}>Reset</Text>
+            </Pressable>
+          </SettingCard>
 
           <SectionHeader title="ABOUT" isDark={isDark} />
           <SettingCard title="Version" isDark={isDark}>

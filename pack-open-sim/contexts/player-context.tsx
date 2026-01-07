@@ -58,6 +58,7 @@ export interface DataConflict {
 interface PlayerContextValue {
   player: Player;
   updatePlayer: (updates: Partial<Player>) => void;
+  resetLocalPlayerData: () => Promise<void>;
   isLoading: boolean;
   dataConflict: DataConflict | null;
   resolveConflict: (choice: "local" | "cloud") => Promise<void>;
@@ -204,9 +205,21 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
     [player, user]
   );
 
+  const resetLocalPlayerData = useCallback(async () => {
+    setPlayer(defaultPlayer);
+    await AsyncStorage.removeItem(STORAGE_KEY);
+  }, []);
+
   return (
     <PlayerContext.Provider
-      value={{ player, updatePlayer, isLoading, dataConflict, resolveConflict }}
+      value={{
+        player,
+        updatePlayer,
+        isLoading,
+        dataConflict,
+        resolveConflict,
+        resetLocalPlayerData,
+      }}
     >
       {children}
     </PlayerContext.Provider>
