@@ -29,7 +29,6 @@ export const unstable_settings = {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
-  const player = usePlayer();
 
   useEffect(() => {
     fetchBaseSetCards().catch((error) => {
