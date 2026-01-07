@@ -1,6 +1,7 @@
 import { Tabs, usePathname } from "expo-router";
 import React from "react";
 import { View, StyleSheet, Image } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { HapticTab } from "@/components/haptic-tab";
 import { Colors } from "@/constants/theme";
@@ -49,6 +50,7 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
   const { player } = usePlayer();
   const pathname = usePathname();
+  const insets = useSafeAreaInsets();
 
   const isLoggedIn = !player.isLoggedIn;
   const isPackOpening = pathname.includes("pack-opening");
@@ -57,6 +59,8 @@ export default function TabLayout() {
   return (
     <View style={styles.container}>
       <Tabs
+        initialRouteName="index"
+        backBehavior="initialRoute"
         screenOptions={{
           tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
           tabBarInactiveTintColor:
@@ -72,7 +76,8 @@ export default function TabLayout() {
             ? { display: "none" }
             : {
                 paddingTop: 8,
-                height: 70,
+                paddingBottom: Math.max(10, insets.bottom),
+                height: 70 + insets.bottom,
               },
         }}
       >

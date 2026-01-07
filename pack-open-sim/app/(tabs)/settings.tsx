@@ -7,7 +7,7 @@ import {
   Pressable,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useTheme } from "@/contexts/theme-context";
 import { useAuth } from "@/contexts/auth-context";
@@ -17,7 +17,12 @@ import { SectionHeader } from "@/components/ui/section-header";
 import { AppHeader } from "@/components/ui/app-header";
 import { THEME_COLORS } from "@/constants/colors";
 import { FONTS } from "@/constants/fonts";
-import { signInWithGoogleWeb, isWeb } from "@/services/firebase-auth";
+import {
+  signInWithGoogleWeb,
+  isWeb,
+  signInWithGoogleNative,
+  useGoogleAuth,
+} from "@/services/firebase-auth";
 import { useAudio } from "@/contexts/audio-context";
 import Slider from "@react-native-community/slider";
 
@@ -30,6 +35,17 @@ export default function SettingsScreen() {
   const colors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
   const [mainThemeVolume, setMainThemeVolume] = useState(0.5);
 
+  const { request, response, promptAsync } = useGoogleAuth();
+
+  useEffect(() => {
+    if (!isWeb && response?.type === "success") {
+      const { id_token } = response.params as { id_token: string };
+      if (id_token) {
+        signInWithGoogleNative(id_token);
+      }
+    }
+  }, [response]);
+
   const toggleTheme = (value: boolean) => {
     setTheme(value ? "dark" : "light");
   };
@@ -37,6 +53,8 @@ export default function SettingsScreen() {
   const handleGoogleLogin = async () => {
     if (isWeb) {
       await signInWithGoogleWeb();
+    } else {
+      await promptAsync();
     }
   };
 
@@ -115,7 +133,11 @@ export default function SettingsScreen() {
               subtitle="Sign in to sync your progress"
               isDark={isDark}
             >
-              <Pressable style={styles.loginButton} onPress={handleGoogleLogin}>
+              <Pressable
+                style={styles.loginButton}
+                onPress={handleGoogleLogin}
+                disabled={!isWeb && !request}
+              >
                 <Text style={styles.loginButtonText}>Sign in with Google</Text>
               </Pressable>
             </SettingCard>

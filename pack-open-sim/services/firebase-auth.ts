@@ -36,9 +36,10 @@ export function useGoogleAuth() {
   const [request, response, promptAsync] = Google.useAuthRequest({
     clientId: WEB_CLIENT_ID,
     redirectUri,
+    scopes: ["profile", "email"],
   });
 
-  console.log("redirectUri", redirectUri);
+  console.log("Google Auth redirect:", request?.redirectUri ?? redirectUri);
 
   return { request, response, promptAsync };
 }
@@ -53,7 +54,6 @@ export async function signInWithGoogleNative(idToken: string) {
   }
 }
 
-// Check if running on web
 export const isWeb = Platform.OS === "web";
 
 export async function logOut() {
