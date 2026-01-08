@@ -171,7 +171,7 @@ export default function SettingsScreen() {
           </SettingCard>
           <SettingCard title="Authors" isDark={isDark}>
             <Text style={[styles.valueText, { color: colors.textSecondary }]}>
-              Matthias Declerck {"\n"} Jarno Mommens
+              Matthias De Klerck {"\n"} Jarno Mommens
             </Text>
           </SettingCard>
         </View>
