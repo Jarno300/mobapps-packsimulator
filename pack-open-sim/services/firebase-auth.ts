@@ -16,6 +16,9 @@ WebBrowser.maybeCompleteAuthSession();
 
 const WEB_CLIENT_ID =
   "1031883564878-cao4ot20p4i1b8d8olakq0g67icjp6sq.apps.googleusercontent.com";
+const ANDROID_CLIENT_ID =
+  "1031883564878-5estb0f5dc5vqi4trspr2hvs0dkf2d0l.apps.googleusercontent.com";
+const IOS_CLIENT_ID = "com.jarnomommens.packopensim";
 
 export async function signInWithGoogleWeb() {
   try {
@@ -34,7 +37,9 @@ export function useGoogleAuth() {
   });
 
   const [request, response, promptAsync] = Google.useAuthRequest({
-    clientId: WEB_CLIENT_ID,
+    responseType: "id_token",
+    androidClientId: ANDROID_CLIENT_ID,
+    webClientId: WEB_CLIENT_ID,
     redirectUri,
     scopes: ["profile", "email"],
   });

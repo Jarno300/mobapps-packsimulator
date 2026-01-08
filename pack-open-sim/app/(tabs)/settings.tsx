@@ -39,9 +39,9 @@ export default function SettingsScreen() {
 
   useEffect(() => {
     if (!isWeb && response?.type === "success") {
-      const { id_token } = response.params as { id_token: string };
-      if (id_token) {
-        signInWithGoogleNative(id_token);
+      const idToken = response.authentication?.idToken as string | undefined;
+      if (idToken) {
+        signInWithGoogleNative(idToken);
       }
     }
   }, [response]);

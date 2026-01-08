@@ -64,8 +64,10 @@ export function NameInputScreen({ onSubmit }: NameInputScreenProps) {
 
   useEffect(() => {
     if (!isWeb && response?.type === "success") {
-      const { id_token } = response.params;
-      handleNativeGoogleSignIn(id_token);
+      const idToken = response.authentication?.idToken as string | undefined;
+      if (idToken) {
+        handleNativeGoogleSignIn(idToken);
+      }
     }
   }, [response]);
 
