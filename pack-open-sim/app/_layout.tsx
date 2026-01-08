@@ -17,7 +17,6 @@ import { PlayerProvider } from "@/contexts/player-context";
 import { AudioProvider } from "@/contexts/audio-context";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { fetchBaseSetCards } from "@/api/fetchCards";
-import { usePlayer } from "@/contexts/player-context";
 import { DataConflictModal } from "@/components/ui/data-conflict-modal";
 
 // Prevent splash screen from auto-hiding
@@ -29,11 +28,10 @@ export const unstable_settings = {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
-  const player = usePlayer();
 
   useEffect(() => {
     fetchBaseSetCards().catch((error) => {
-      console.error("Failed to fetch base set cards:", error);
+      console.error("Error fetching base set cards:", error);
     });
   }, []);
 
@@ -42,6 +40,7 @@ function RootLayoutNav() {
       value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
     >
       <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen
           name="modal"

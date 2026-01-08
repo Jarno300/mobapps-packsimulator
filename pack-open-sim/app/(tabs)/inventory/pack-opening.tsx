@@ -41,14 +41,17 @@ function usePackOpening(packId: string | undefined) {
   }, [packData, player, updatePlayer]);
 
   const revealNextCard = useCallback(() => {
-    setRevealState((prev) => {
-      if (prev.currentIndex < prev.cards.length - 1) {
-        return { ...prev, currentIndex: prev.currentIndex + 1 };
-      }
-      router.back();
-      return prev;
-    });
-  }, [router]);
+    // Avoid navigating during a state reducer to prevent React warnings on native.
+    if (revealState.currentIndex < revealState.cards.length - 1) {
+      setRevealState((prev) => ({
+        ...prev,
+        currentIndex: prev.currentIndex + 1,
+      }));
+      return;
+    }
+
+    router.back();
+  }, [revealState, router]);
 
   const state: OpeningState = useMemo(() => {
     if (revealState.isRevealing) {

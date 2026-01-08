@@ -16,16 +16,21 @@ import { ThemedText } from "@/components/themed-text";
 import { getCardCache } from "@/cache/setCardCache";
 import { useSellCard } from "@/hooks/use-sell-card";
 import { usePlayer } from "@/contexts/player-context";
+import { Card } from "@/api/fetchCards";
 
-export default function CardInfoScreen() {
+export function CardInfo({
+    card,
+    showSellButton = true,
+    onSell,
+}: {
+    card: Card;
+    showSellButton?: boolean;
+    onSell?: () => void;
+}) {
     const { isDark } = useTheme();
     const colors = isDark ? THEME_COLORS.dark : THEME_COLORS.light;
-
-    const { sellCard } = useSellCard();
-    const { cardId } = useLocalSearchParams<{ cardId: string }>();
-    const cardList = getCardCache();
-    const card = cardList.find((c) => String(c.id) === cardId);
-    const player = usePlayer().player;
+    const { player } = usePlayer();
+    const ownedCount = player.ownedCards[card.id] ?? 0;
 
     if (
         !card ||
@@ -40,86 +45,110 @@ export default function CardInfoScreen() {
             </View>
         );
     }
+
     return (
-        <ScrollView>
-            <View style={styles.container}>
-                <View style={styles.cardContainer}>
-                    <Image source={{ uri: card?.image }} style={styles.image} />
-                </View>
-                <PokeBorder
-                    style={{ width: "100%", marginTop: 5 }}
+        <View style={[styles.container]}>
+            <View style={styles.cardContainer}>
+                <Image source={{ uri: card.image }} style={styles.image} />
+            </View>
+            <PokeBorder
+                style={{ width: "100%", marginTop: 5, borderColor: colors.border }}
+            >
+                <View
+                    style={{ width: "100%", padding: 5, backgroundColor: colors.card }}
                 >
-                    <View style={{ width: "100%", padding: 5 }}>
-                        <View style={styles.dynamicContentContainer}>
-                            <ThemedText
-                                style={[
-                                    styles.text,
-                                    styles.staticContent,
-                                    { color: colors.textSecondary },
-                                ]}
-                            >
-                                NAME:
-                            </ThemedText>
-                            {nameLengthChecker(card.name)}
+                    <View style={styles.dynamicContentContainer}>
+                        <ThemedText
+                            style={[
+                                styles.text,
+                                styles.staticContent,
+                                { color: colors.textSecondary },
+                            ]}
+                        >
+                            NAME:
+                        </ThemedText>
+                        {nameLengthChecker(card.name)}
+                    </View>
+                    <View style={styles.typeContainer}>
+                        <ThemedText style={[styles.text, styles.staticContent]}>
+                            TYPES:{" "}
+                        </ThemedText>
+                        <View style={styles.typeImageContainer}>
+                            {typeImageGenerator(card.typeLogos)}
                         </View>
-                        <View style={styles.typeContainer}>
-                            <ThemedText style={[styles.text, styles.staticContent]}>
-                                TYPES:{" "}
-                            </ThemedText>
-                            <View style={styles.typeImageContainer}>
-                                {typeImageGenerator(card?.typeLogos)}
-                            </View>
-                        </View>
-                        <View style={styles.dynamicContentContainer}>
-                            <ThemedText style={[styles.text, styles.staticContent]}>
-                                RARITY:
-                            </ThemedText>
-                            <ThemedText style={[styles.text, styles.dynamicContent]}>
-                                {card.rarity.toUpperCase()}
-                            </ThemedText>
-                        </View>
+                    </View>
+                    <View style={styles.dynamicContentContainer}>
+                        <ThemedText style={[styles.text, styles.staticContent]}>
+                            RARITY:
+                        </ThemedText>
+                        <ThemedText style={[styles.text, styles.dynamicContent]}>
+                            {card.rarity.toUpperCase()}
+                        </ThemedText>
+                    </View>
 
-                        <View style={styles.holoContainer}>
-                            <ThemedText style={[styles.text, styles.staticContent]}>
-                                HOLO:
-                            </ThemedText>
-                            <View style={styles.holoImageContainer}>
-                                {holoCheckImageGenerator(card.holo)}
-                            </View>
+                    <View style={styles.holoContainer}>
+                        <ThemedText style={[styles.text, styles.staticContent]}>
+                            HOLO:
+                        </ThemedText>
+                        <View style={styles.holoImageContainer}>
+                            {holoCheckImageGenerator(card.holo)}
                         </View>
-                        <View style={styles.dynamicContentContainer}>
-                            <ThemedText style={[styles.text, styles.staticContent]}>
-                                OWNED:
+                    </View>
+                    <View style={styles.dynamicContentContainer}>
+                        <ThemedText style={[styles.text, styles.staticContent]}>
+                            OWNED:
+                        </ThemedText>
+                        <ThemedText style={[styles.text, styles.dynamicContent]}>
+                            {ownedCount}
+                        </ThemedText>
+                    </View>
+                    <View style={styles.priceContainer}>
+                        <ThemedText style={[styles.text, styles.staticContent]}>
+                            PRICE:
+                        </ThemedText>
+                        <View style={[styles.priceValueContainer, styles.dynamicContent]}>
+                            <ThemedText style={[styles.text]}>
+                                {card.price.toString()}
                             </ThemedText>
-                            <ThemedText style={[styles.text, styles.dynamicContent]}>
-                                {player.ownedCards[card.id] ?? 0}
-                            </ThemedText>
+                            <Image
+                                source={require("../../../assets/images/pokecoin.png")}
+                                style={styles.styleCoin}
+                            />
                         </View>
-                        <View style={styles.priceContainer}>
-                            <ThemedText style={[styles.text, styles.staticContent]}>
-                                PRICE:
-                            </ThemedText>
-                            <View style={[styles.priceValueContainer, styles.dynamicContent]}>
-                                <ThemedText style={[styles.text]}>
-                                    {card.price.toString()}
-                                </ThemedText>
-                                <Image
-                                    source={require("../../../assets/images/pokecoin.png")}
-                                    style={styles.styleCoin}
-                                />
-                            </View>
-                        </View>
+                    </View>
 
+                    {showSellButton && (
                         <TouchableOpacity
                             style={styles.sellButton}
-                            onPress={() => sellCard(card)}
-                            disabled={(player.ownedCards[card.id] ?? 0) <= 0}
+                            onPress={onSell}
+                            disabled={ownedCount <= 0}
                         >
                             <ThemedText style={styles.text}>SELL 1</ThemedText>
                         </TouchableOpacity>
-                    </View>
-                </PokeBorder>
+                    )}
+                </View>
+            </PokeBorder>
+        </View>
+    );
+}
+
+export default function CardInfoScreen() {
+    const { sellCard } = useSellCard();
+    const { cardId } = useLocalSearchParams<{ cardId: string }>();
+    const cardList = getCardCache();
+    const card = cardList.find((c) => String(c.id) === cardId);
+
+    if (!card) {
+        return (
+            <View style={styles.container}>
+                <ThemedText>Card not found</ThemedText>
             </View>
+        );
+    }
+
+    return (
+        <ScrollView>
+            <CardInfo card={card} onSell={() => sellCard(card)} />
         </ScrollView>
     );
 }
@@ -190,6 +219,11 @@ const styles = StyleSheet.create({
         justifyContent: "flex-start",
         paddingTop: 0,
         marginBottom: 20,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.25,
+        shadowRadius: 12,
+        elevation: 12,
     },
     image: {
         width: 200,
@@ -197,7 +231,10 @@ const styles = StyleSheet.create({
         aspectRatio: 63 / 88,
         resizeMode: "contain",
         marginTop: 5,
-        borderRadius: 6,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: "rgba(0, 0, 0, 0.1)",
+        backgroundColor: "#FFFFFF",
     },
     title: {
         marginTop: 15,

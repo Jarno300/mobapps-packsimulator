@@ -46,9 +46,11 @@ export function NameInputScreen({ onSubmit }: NameInputScreenProps) {
       startMusic();
     }
     return () => {
-      titleMusic.pause();
+      try {
+        titleMusic.pause();
+      } catch (error) {}
     };
-  }, [titleMusic.player]);
+  }, []);
 
   // Handle transition - stop title music, play battle music
   useEffect(() => {
