@@ -13,7 +13,7 @@ export function fadeOutAudio(
 ) {
   const fadeSteps = 20;
   const stepDuration = duration / fadeSteps;
-  const initialVolume = player.volume || 0.5;
+  const initialVolume = player.volume || 0.2;
   const volumeStep = initialVolume / fadeSteps;
   let currentVolume = initialVolume;
 
@@ -37,7 +37,7 @@ export function useTitleScreenMusic() {
 
   const play = () => {
     player.loop = true;
-    player.volume = 0.5;
+    player.volume = 0.2;
     player.play();
   };
 
@@ -56,7 +56,7 @@ export function useBattleMusic() {
   const player = useAudioPlayer(AUDIO_TRACKS.battle);
 
   const play = () => {
-    player.volume = 0.5;
+    player.volume = 0.2;
     player.play();
   };
 
