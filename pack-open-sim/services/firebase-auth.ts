@@ -39,7 +39,7 @@ export function useGoogleAuth() {
     scopes: ["profile", "email"],
   });
 
-  console.log("Google Auth redirect:", request?.redirectUri ?? redirectUri);
+  console.log("Google Auth redirect:", request?.redirectUri);
 
   return { request, response, promptAsync };
 }
