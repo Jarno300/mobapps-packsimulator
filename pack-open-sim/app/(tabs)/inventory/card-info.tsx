@@ -52,7 +52,7 @@ export function CardInfo({
                 <Image source={{ uri: card.image }} style={styles.image} />
             </View>
             <PokeBorder
-                style={{ width: "100%", marginTop: 5, borderColor: colors.border }}
+                style={{ width: "100%", marginTop: 5 }}
             >
                 <View
                     style={{ width: "100%", padding: 5, backgroundColor: colors.card }}
@@ -62,7 +62,7 @@ export function CardInfo({
                             style={[
                                 styles.text,
                                 styles.staticContent,
-                                { color: colors.textSecondary },
+
                             ]}
                         >
                             NAME:
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 12,
 
-        borderRadius: 5,       // Pokémon kaarten zijn behoorlijk rond, 12 is een mooie waarde
+        borderRadius: 5,
         overflow: "hidden",
     },
     image: {
