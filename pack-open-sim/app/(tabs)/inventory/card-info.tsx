@@ -52,7 +52,7 @@ export function CardInfo({
                 <Image source={{ uri: card.image }} style={styles.image} />
             </View>
             <PokeBorder
-                style={{ width: "100%", marginTop: 5, borderColor: colors.border }}
+                style={{ width: "100%", marginTop: 5 }}
             >
                 <View
                     style={{ width: "100%", padding: 5, backgroundColor: colors.card }}
@@ -62,7 +62,7 @@ export function CardInfo({
                             style={[
                                 styles.text,
                                 styles.staticContent,
-                                { color: colors.textSecondary },
+
                             ]}
                         >
                             NAME:
@@ -215,26 +215,33 @@ const styles = StyleSheet.create({
     },
 
     cardContainer: {
+        height: 270,
+        aspectRatio: 63 / 88,
         alignItems: "center",
         justifyContent: "flex-start",
         paddingTop: 0,
         marginBottom: 20,
+        elevation: 12,
+        backgroundColor: "none",
+        borderColor: "rgba(0, 0, 0, 0.1)",
+
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.25,
         shadowRadius: 12,
-        elevation: 12,
+
+        borderRadius: 5,
+        overflow: "hidden",
     },
     image: {
-        width: 200,
-        height: 280,
-        aspectRatio: 63 / 88,
-        resizeMode: "contain",
-        marginTop: 5,
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: "rgba(0, 0, 0, 0.1)",
-        backgroundColor: "#FFFFFF",
+
+        height: "100%",
+        width: "100%",
+
+        resizeMode: "cover",
+
+
+
     },
     title: {
         marginTop: 15,
