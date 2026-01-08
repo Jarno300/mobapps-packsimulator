@@ -45,22 +45,26 @@ export function CardRevealView({
 
       <Fireworks isActive={fireworksActive} intensity="high" />
 
-      <Animated.View style={[styles.content]}>
-        <ThemedText style={[styles.counter, styles.lightText]}>
-          {progressText}
-        </ThemedText>
-
-        <Pressable onPress={onNext} style={styles.pressable}>
-          <CardInfo card={currentCard} showSellButton={false} />
-          <ThemedText style={[styles.tapText, styles.lightText]}>
-            {actionText}
+      <View style={styles.inner}>
+        {" "}
+        {/* vaste 80% breedte */}
+        <Animated.View style={styles.content}>
+          <ThemedText style={[styles.counter, styles.lightText]}>
+            {progressText}
           </ThemedText>
-        </Pressable>
 
-        <View style={styles.typeBadge}>
-          <ThemedText style={styles.typeBadgeText}>{cardType}</ThemedText>
-        </View>
-      </Animated.View>
+          <Pressable onPress={onNext} style={styles.pressable}>
+            <CardInfo card={currentCard} showSellButton={false} />
+            <ThemedText style={[styles.tapText, styles.lightText]}>
+              {actionText}
+            </ThemedText>
+          </Pressable>
+
+          <View style={styles.typeBadge}>
+            <ThemedText style={styles.typeBadgeText}>{cardType}</ThemedText>
+          </View>
+        </Animated.View>
+      </View>
     </View>
   );
 }
@@ -71,18 +75,25 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     overflow: "hidden",
+    width: "100%",
+  },
+  inner: {
+    width: "80%",
+    alignSelf: "center",
   },
   content: {
     alignItems: "center",
     zIndex: 10,
+    width: "100%",
+  },
+  pressable: {
+    alignItems: "center",
+    width: "100%",
   },
   counter: {
     fontSize: 16,
     opacity: 0.6,
     marginBottom: 16,
-  },
-  pressable: {
-    alignItems: "center",
   },
   lightText: {
     color: "#FFFFFF",

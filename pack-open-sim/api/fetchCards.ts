@@ -33,6 +33,7 @@ export async function fetchCardDetails(cardId: string): Promise<Card | null> {
   try {
     const response = await fetch(`${API_URL}/cards/${cardId}`);
     if (!response.ok) {
+      console.log(`Failed to fetch card ${cardId}: HTTP ${response.status}`);
       return null;
     }
     const card = await response.json();
@@ -48,27 +49,35 @@ export async function fetchCardDetails(cardId: string): Promise<Card | null> {
       energyType: card.energyType,
       image: card.image ? `${card.image}/high.webp` : undefined,
       holo: card.variants?.holo ?? false,
-      price: Number(Math.ceil(card.pricing.cardmarket.avg)),
+      price: card.pricing?.cardmarket?.avg
+        ? Number(Math.ceil(card.pricing.cardmarket.avg))
+        : 1,
       typeLogos: addPokemonTypeLogos(card),
     };
-  } catch {
+  } catch (error) {
+    console.log(`Error fetching card ${cardId}:`, error);
     return null;
   }
 }
 
 async function fetchCardsInBatches(
   cardIds: string[],
-  batchSize = 10
+  batchSize = 51
 ): Promise<Card[]> {
   const cards: Card[] = [];
+  let failedCount = 0;
 
   for (let i = 0; i < cardIds.length; i += batchSize) {
     const batch = cardIds.slice(i, i + batchSize);
     const batchResults = await Promise.all(batch.map(fetchCardDetails));
 
-    for (const card of batchResults) {
+    for (let j = 0; j < batchResults.length; j++) {
+      const card = batchResults[j];
       if (card) {
         cards.push(card);
+      } else {
+        failedCount++;
+        console.log(`Card failed to fetch (index ${i + j}): ${batch[j]}`);
       }
     }
 
@@ -77,6 +86,9 @@ async function fetchCardsInBatches(
     }
   }
 
+  console.log(
+    `Successfully fetched ${cards.length} cards out of ${cardIds.length} (${failedCount} failed)`
+  );
   return cards;
 }
 
@@ -98,6 +110,11 @@ export async function fetchBaseSetCards() {
 
     const json = await response.json();
     const rawCards = json.cards || [];
+
+    console.log(`Fetched ${rawCards.length} cards from base set`);
+    for (const card of rawCards) {
+      console.log(`Card ID: ${card.id}, Name: ${card.name}`);
+    }
 
     if (!Array.isArray(rawCards) || rawCards.length === 0) {
       throw new Error("No cards found in API response");
